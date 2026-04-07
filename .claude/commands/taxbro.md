@@ -1,5 +1,49 @@
 Show a full overview of the TaxBro project — what it is, all available commands, and current session status.
 
+If $ARGUMENTS contains "--status", run STATUS MODE instead of the full overview (see below).
+
+---
+
+## STATUS MODE — /taxbro --status
+
+Print a concise key:value block. Do this in under 15 lines. No tables, no prose, no headers.
+
+Steps:
+1. Read .current-session → SOURCE_FOLDER. If missing, print "session: none" and stop.
+2. Check which output files exist in {SOURCE_FOLDER}/TAXBRO/ and note their mtime.
+3. Scan {SOURCE_FOLDER}/TAXBRO/.snapshots/ — count snapshot directories.
+4. Read the first few lines of {SOURCE_FOLDER}/TAXBRO/session-notes.md if it exists (for tax year / filer context).
+5. Read {SOURCE_FOLDER}/CLAUDE.md or any subfolder CLAUDE.md to infer tax year and filing status (structural only, no PII).
+
+Print exactly this format (omit any line where the value is unknown/not applicable):
+
+```
+session:      <last path component of SOURCE_FOLDER, e.g. "ALL-TAX-DOCS">
+folder:       <SOURCE_FOLDER>
+tax year:     <inferred year, e.g. "2025 (filed 2026)">
+filing:       <e.g. "MFJ, sole earner, dual W-2">
+cross-border: <e.g. "India (FBAR, PFIC, FTC), Canada (FBAR)"> or "none"
+snapshots:    <N archived — run /taxbro-init --reset to create another>
+outputs:
+  checklist:      <exists | missing> [last updated: YYYY-MM-DD]
+  w2:             <exists | missing> [last updated: YYYY-MM-DD]
+  fbar:           <exists | missing> [last updated: YYYY-MM-DD]
+  pfic:           <exists | missing> [last updated: YYYY-MM-DD]
+  ftc:            <exists | missing> [last updated: YYYY-MM-DD]
+  childcare:      <exists | missing> [last updated: YYYY-MM-DD]
+  rental:         <exists | missing> [last updated: YYYY-MM-DD]
+  worksheets:     <exists | missing> [last updated: YYYY-MM-DD]
+  validation:     <exists | missing> [last updated: YYYY-MM-DD]
+next:         <one-line suggestion: e.g. "run /taxbro-checklist to start" or "all outputs present — run /taxbro-validate-return">
+```
+
+Use `stat -f "%Sm" -t "%Y-%m-%d"` (macOS) to get mtime. If stat fails, omit the date.
+Never print balances, names, SSNs, or any content from documents — structural metadata only.
+
+---
+
+## FULL OVERVIEW MODE
+
 ## What to display
 
 ### 1. Project description
