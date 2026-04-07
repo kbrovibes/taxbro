@@ -1,45 +1,51 @@
 Analyze Indian (or other foreign) mutual fund holdings for PFIC compliance.
 
-Background:
+## Get source folder
+Read ~/claude/taxbro/.current-session, or use path from $ARGUMENTS.
+If missing: "Please run /taxbro-init first."
+
+## Determine active year
+1. Read {SOURCE_FOLDER}/TAXBRO/file-index.md. If missing: run /taxbro-init first.
+2. If $ARGUMENTS contains a 4-digit year (2020–2030), use it as ACTIVE_YEAR.
+   Otherwise use the most recent year listed in file-index.md.
+3. OUTPUT_DIR = {SOURCE_FOLDER}/TAXBRO/{ACTIVE_YEAR}/  (create if needed)
+4. Tell user: "Analyzing PFIC holdings for tax year {ACTIVE_YEAR}. (Override: /taxbro-check-pfic 2024)"
+
+## Background
 - Indian mutual funds are almost certainly PFICs (Passive Foreign Investment Companies)
-- Form 8621 must be filed per PFIC fund per year (with exceptions)
-- De minimis exception: aggregate value of all PFIC shares ≤ $50,000 at year-end AND no prior QEF/MTM elections
-- Three methods: (1) Default excess distribution, (2) QEF election, (3) Mark-to-Market election
+- Form 8621 required per PFIC fund per year (exceptions apply)
+- De minimis: aggregate value ≤ $50,000 year-end AND no prior QEF/MTM elections
+- Three methods: (1) Default excess distribution, (2) QEF election, (3) Mark-to-Market
 
-Steps:
-1. Get source folder from $ARGUMENTS or ~/claude/taxbro/.current-session.
+## Analysis
 
-2. Read CLAUDE.md for context on who holds the mutual funds (primary filer vs spouse) and any prior elections.
+Read CLAUDE.md for prior election history and who holds the funds.
+Find mutual fund statements for ACTIVE_YEAR using file-index.md (category: Mutual fund / PFIC, year: ACTIVE_YEAR).
 
-3. Find mutual fund statement files (CAMS CAS, KARVY/KFintech statements, or similar).
+For each fund, extract:
+- Fund name and AMC
+- ISIN or scheme code
+- Units held as of December 31
+- NAV and total value (INR) as of December 31
+- Any redemptions or withdrawals during the year
+- Any dividends paid or reinvested
 
-4. For each fund found, extract:
-   - Fund name and fund house (AMC)
-   - ISIN or scheme code
-   - Units held as of December 31
-   - NAV (Net Asset Value) as of December 31
-   - Total value in INR as of December 31
-   - Any redemptions/withdrawals during the year (distributions = taxable events under default method)
-   - Any dividends paid/reinvested during the year
+Convert total portfolio value to USD (IRS Pub 54 rate).
 
-5. Convert total portfolio value to USD (IRS Pub 54 average rate or year-end rate).
+Determinations:
+a. De minimis: total USD ≤ $50,000 AND no prior elections → Form 8621 may not be required (flag for preparer)
+b. Redemptions occurred → excess distribution calculation needed for those funds
+c. No redemptions, no distributions, default method → no income to report but Form 8621 still required if above de minimis
+d. If prior QEF/MTM elections exist → confirm continuation; switching requires purging election (costly)
 
-6. Determinations:
-   a. De minimis check: if total USD value ≤ $50,000 AND no prior QEF/MTM elections → Form 8621 may not be required (flag for confirmation with tax preparer)
-   b. If any redemptions occurred → excess distribution calculation needed for each fund with redemptions
-   c. If no redemptions AND no distributions AND using default method → no annual income to report, but Form 8621 still required if above de minimis
+## Write output
+Write to {OUTPUT_DIR}/pfic-summary.md:
+- Table: Fund | AMC | Units | Dec 31 NAV (INR) | Dec 31 Value (INR) | Dec 31 Value (USD) | Redemptions | Form 8621 Required
+- Total portfolio USD value
+- De minimis determination
+- Election status and recommendation per fund
 
-7. Election analysis:
-   - If no elections were made in prior years: default (excess distribution) method applies
-   - Switching to QEF requires a "purging election" — significant tax catch-up cost; flag if considering
-   - MTM election: simpler annually but requires unrealized gain/loss each year
+Update {OUTPUT_DIR}/CLAUDE.md — change the PFIC row from "⏳ not run" to "✅ complete", set today's date.
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/pfic-summary.md:
-   - Table: Fund Name | AMC | Units | Dec 31 NAV (INR) | Dec 31 Value (INR) | Dec 31 Value (USD) | Redemptions This Year | Form 8621 Required
-   - Total portfolio USD value
-   - De minimis determination
-   - Recommended action per fund
-   - Election status and recommendation
-
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/pfic-summary.md only.
-Never write financial data to ~/claude/taxbro/.
+IMPORTANT: Never write financial data to ~/claude/taxbro/.
+All output goes to {OUTPUT_DIR}/pfic-summary.md only.
