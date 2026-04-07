@@ -62,6 +62,7 @@ When pointed at a source folder, TaxBro expects:
 ### What TaxBro writes to `{SOURCE_FOLDER}/TAXBRO/`:
 | File | Contents |
 |------|----------|
+| `file-index.md` | Full knowledge graph: all source files, categories, inferred types, sizes, change log |
 | `checklist.md` | Status of all key tax issues |
 | `fbar-summary.md` | Foreign account balances table for FinCEN 114 |
 | `pfic-summary.md` | PFIC fund list, distribution check, Form 8621 determination |
@@ -80,7 +81,7 @@ When pointed at a source folder, TaxBro expects:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro` | Show all commands, session status, and output file reference |
-| `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover documents |
+| `/taxbro-init [path]` | Load source folder, build file index + knowledge graph; use `--refresh` to reindex |
 | `/taxbro-checklist` | Full status check across all tax issues |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
 | `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
