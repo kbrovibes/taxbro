@@ -52,7 +52,7 @@ Steps:
    - Any missing document flags
    Do NOT write any personal data, names, account numbers, or financial figures to this file — structural notes only.
 
-8. Tell the user: "TaxBro initialized. Source folder loaded with N documents. Run /tax-checklist to see full status."
+8. Tell the user: "TaxBro initialized. Source folder loaded with N documents. Run /taxbro-checklist to see full status."
    If Finder aliases were found, include the warning about converting them.
 
 IMPORTANT: Never write any PII, financial data, or document contents to ~/claude/taxbro/ or any file within it.

@@ -87,7 +87,7 @@ TaxBro reads your CLAUDE.md, lists all discovered documents grouped by type, fla
 **Step 4 — Run the checklist**
 
 ```
-/tax-checklist
+/taxbro-checklist
 ```
 
 Shows a full status table: which issues apply to you, whether source documents are present, whether analysis has been run, and any risk flags. Start here every session — it tells you what still needs attention.
@@ -97,14 +97,14 @@ Shows a full status table: which issues apply to you, whether source documents a
 For a simple filer:
 
 ```
-/check-w2s          # Analyzes all W-2s, checks for excess SS withholding
-/check-childcare    # Analyzes childcare expenses, Form 2441 eligibility
+/taxbro-check-w2s          # Analyzes all W-2s, checks for excess SS withholding
+/taxbro-check-childcare    # Analyzes childcare expenses, Form 2441 eligibility
 ```
 
 **Step 6 — Generate worksheets**
 
 ```
-/generate-worksheets
+/taxbro-generate-worksheets
 ```
 
 Produces a single `worksheets.md` with pre-filled line items for every applicable IRS form — ready to hand to a preparer or enter into tax software.
@@ -114,7 +114,7 @@ Produces a single `worksheets.md` with pre-filled line items for every applicabl
 Once your preparer sends a draft PDF:
 
 ```
-/validate-return ~/Documents/taxes-2025/draft-return.pdf
+/taxbro-validate-return ~/Documents/taxes-2025/draft-return.pdf
 ```
 
 Cross-checks every key line against your source documents and flags discrepancies.
@@ -127,15 +127,15 @@ Cross-checks every key line against your source documents and flags discrepancie
 |---------|---------|
 | `/taxbro` | Overview: all commands, session status, output file reference |
 | `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover and categorize documents |
-| `/tax-checklist` | Full status sweep: documents present, analysis done, risk flags |
-| `/check-w2s` | W-2 analysis: wages, withholding, excess SS credit, DCFSA, HSA employer contribs |
-| `/check-fbar` | Foreign accounts: max and year-end balances, FBAR (FinCEN 114) and Form 8938 thresholds |
-| `/check-pfic` | Foreign mutual funds: PFIC determination, de minimis check, Form 8621 per fund |
-| `/foreign-tax-credit` | Consolidate all foreign taxes paid by basket → Form 1116 |
-| `/check-childcare` | Childcare expenses: provider EINs, DCFSA offset, Form 2441 eligibility + earned-income test |
-| `/rental-income` | Foreign rental income: INR→USD conversion, TDS, Schedule E summary, depreciation |
-| `/generate-worksheets` | Pre-filled worksheets for all applicable IRS forms (FBAR, 1116, 8621, Schedule E, 2441, 1040 summary) |
-| `/validate-return [pdf]` | Cross-check a completed or draft return PDF against all source documents |
+| `/taxbro-checklist` | Full status sweep: documents present, analysis done, risk flags |
+| `/taxbro-check-w2s` | W-2 analysis: wages, withholding, excess SS credit, DCFSA, HSA employer contribs |
+| `/taxbro-check-fbar` | Foreign accounts: max and year-end balances, FBAR (FinCEN 114) and Form 8938 thresholds |
+| `/taxbro-check-pfic` | Foreign mutual funds: PFIC determination, de minimis check, Form 8621 per fund |
+| `/taxbro-foreign-tax-credit` | Consolidate all foreign taxes paid by basket → Form 1116 |
+| `/taxbro-check-childcare` | Childcare expenses: provider EINs, DCFSA offset, Form 2441 eligibility + earned-income test |
+| `/taxbro-rental-income` | Foreign rental income: INR→USD conversion, TDS, Schedule E summary, depreciation |
+| `/taxbro-generate-worksheets` | Pre-filled worksheets for all applicable IRS forms (FBAR, 1116, 8621, Schedule E, 2441, 1040 summary) |
+| `/taxbro-validate-return [pdf]` | Cross-check a completed or draft return PDF against all source documents |
 
 ---
 
@@ -160,7 +160,7 @@ After running this, all other skills can be invoked without a path argument.
 
 ---
 
-### `/tax-checklist`
+### `/taxbro-checklist`
 
 Runs a full status check across all applicable tax issues.
 
@@ -189,7 +189,7 @@ Output: a status table with ✅ clear, ⚠️ needs attention, ❌ blocked by mi
 
 ---
 
-### `/check-w2s`
+### `/taxbro-check-w2s`
 
 Analyzes all W-2 forms found in the source folder.
 
@@ -197,14 +197,14 @@ Analyzes all W-2 forms found in the source folder.
 
 **Calculations:**
 - **Excess Social Security**: if you worked for multiple employers and total Box 4 across all W-2s exceeds the annual cap ($10,918.20 for 2025 at the $176,100 wage base), the excess is a refundable credit on Form 1040
-- **DCFSA coordination**: Box 10 amounts are passed to `/check-childcare` for Form 2441 offset
+- **DCFSA coordination**: Box 10 amounts are passed to `/taxbro-check-childcare` for Form 2441 offset
 - **HSA**: Box 12 Code W employer contributions are flagged for contribution limit checking
 
 Output: `TAXBRO/w2-summary.md`
 
 ---
 
-### `/check-fbar`
+### `/taxbro-check-fbar`
 
 Determines FBAR (FinCEN 114) and Form 8938 (FATCA) filing requirements.
 
@@ -223,7 +223,7 @@ Output: `TAXBRO/fbar-summary.md`
 
 ---
 
-### `/check-pfic`
+### `/taxbro-check-pfic`
 
 Analyzes foreign mutual fund holdings for PFIC (Passive Foreign Investment Company) compliance.
 
@@ -240,7 +240,7 @@ Output: `TAXBRO/pfic-summary.md`
 
 ---
 
-### `/foreign-tax-credit`
+### `/taxbro-foreign-tax-credit`
 
 Consolidates all foreign taxes paid for Form 1116, organized by income basket.
 
@@ -256,7 +256,7 @@ Output: `TAXBRO/ftc-summary.md`
 
 ---
 
-### `/check-childcare`
+### `/taxbro-check-childcare`
 
 Analyzes childcare expenses for Form 2441 (Child and Dependent Care Credit).
 
@@ -273,7 +273,7 @@ Output: `TAXBRO/childcare-summary.md`
 
 ---
 
-### `/rental-income`
+### `/taxbro-rental-income`
 
 Analyzes foreign rental property income for Schedule E.
 
@@ -281,17 +281,17 @@ Looks for income in: AIS/TIS statements (India), bank statement credits consiste
 
 **Per property:**
 - Gross rent in local currency, converted to USD using IRS Pub 54 annual average rate
-- TDS deducted (carried to `/foreign-tax-credit`)
+- TDS deducted (carried to `/taxbro-foreign-tax-credit`)
 - Filer's ownership share (if co-owned)
 - Schedule E expense items: property taxes, repairs, management fees, mortgage interest, depreciation
 
 **Depreciation:** foreign residential property depreciates over 30 years (not 27.5 like US property). Basis = purchase price × ownership % × USD rate at acquisition date. TaxBro flags if the depreciation basis has not been established — a common and costly oversight.
 
-Output: `TAXBRO/rental-income.md`
+Output: `TAXBRO/taxbro-rental-income.md`
 
 ---
 
-### `/generate-worksheets`
+### `/taxbro-generate-worksheets`
 
 Produces pre-filled line-item worksheets for every applicable IRS form, ready to hand to a preparer or enter into tax software directly.
 
@@ -311,7 +311,7 @@ Output: `TAXBRO/worksheets.md`
 
 ---
 
-### `/validate-return [pdf]`
+### `/taxbro-validate-return [pdf]`
 
 Cross-checks a completed or draft return PDF against all your source documents and TaxBro analysis outputs.
 
@@ -343,15 +343,15 @@ All output goes to `{SOURCE_FOLDER}/TAXBRO/`. Keep this folder private — it co
 | File | Produced by | Contents |
 |------|-------------|---------|
 | `session-notes.md` | `/taxbro-init` | Initialization log, document counts, missing doc flags |
-| `checklist.md` | `/tax-checklist` | Full status table with dates |
-| `w2-summary.md` | `/check-w2s` | W-2 table, excess SS calc, DCFSA/HSA flags |
-| `fbar-summary.md` | `/check-fbar` | Account balances, FBAR/8938 determinations |
-| `pfic-summary.md` | `/check-pfic` | Fund table, de minimis determination, Form 8621 per fund |
-| `ftc-summary.md` | `/foreign-tax-credit` | Foreign taxes by basket, FTC limitation note |
-| `childcare-summary.md` | `/check-childcare` | Provider table, DCFSA offset, Form 2441 eligibility |
-| `rental-income.md` | `/rental-income` | Monthly rent table, USD conversion, Schedule E summary |
-| `worksheets.md` | `/generate-worksheets` | Pre-filled line items for all applicable forms |
-| `validation-report.md` | `/validate-return` | Line-by-line cross-check results |
+| `checklist.md` | `/taxbro-checklist` | Full status table with dates |
+| `w2-summary.md` | `/taxbro-check-w2s` | W-2 table, excess SS calc, DCFSA/HSA flags |
+| `fbar-summary.md` | `/taxbro-check-fbar` | Account balances, FBAR/8938 determinations |
+| `pfic-summary.md` | `/taxbro-check-pfic` | Fund table, de minimis determination, Form 8621 per fund |
+| `ftc-summary.md` | `/taxbro-foreign-tax-credit` | Foreign taxes by basket, FTC limitation note |
+| `childcare-summary.md` | `/taxbro-check-childcare` | Provider table, DCFSA offset, Form 2441 eligibility |
+| `rental-income.md` | `/taxbro-rental-income` | Monthly rent table, USD conversion, Schedule E summary |
+| `worksheets.md` | `/taxbro-generate-worksheets` | Pre-filled line items for all applicable forms |
+| `validation-report.md` | `/taxbro-validate-return` | Line-by-line cross-check results |
 
 ---
 
@@ -411,18 +411,18 @@ These rules are absolute:
 
 | Form | Handled by |
 |------|-----------|
-| Form 1040 (key lines) | `/generate-worksheets` |
-| W-2 excess SS credit (Schedule 3) | `/check-w2s` |
-| Schedule B (interest, dividends, Part III) | `/tax-checklist`, `/validate-return` |
-| Schedule E (foreign rental) | `/rental-income` |
-| Schedule D / Form 8949 | `/tax-checklist` (presence check), `/validate-return` |
-| Form 1098 (mortgage interest) | `/tax-checklist` |
-| Form 2441 (childcare credit) | `/check-childcare` |
-| FinCEN 114 (FBAR) | `/check-fbar` |
-| Form 8938 (FATCA) | `/check-fbar` |
-| Form 8621 (PFIC) | `/check-pfic` |
-| Form 1116 (foreign tax credit) | `/foreign-tax-credit` |
-| Form 8889 (HSA) | `/tax-checklist` (presence check) |
+| Form 1040 (key lines) | `/taxbro-generate-worksheets` |
+| W-2 excess SS credit (Schedule 3) | `/taxbro-check-w2s` |
+| Schedule B (interest, dividends, Part III) | `/taxbro-checklist`, `/taxbro-validate-return` |
+| Schedule E (foreign rental) | `/taxbro-rental-income` |
+| Schedule D / Form 8949 | `/taxbro-checklist` (presence check), `/taxbro-validate-return` |
+| Form 1098 (mortgage interest) | `/taxbro-checklist` |
+| Form 2441 (childcare credit) | `/taxbro-check-childcare` |
+| FinCEN 114 (FBAR) | `/taxbro-check-fbar` |
+| Form 8938 (FATCA) | `/taxbro-check-fbar` |
+| Form 8621 (PFIC) | `/taxbro-check-pfic` |
+| Form 1116 (foreign tax credit) | `/taxbro-foreign-tax-credit` |
+| Form 8889 (HSA) | `/taxbro-checklist` (presence check) |
 
 ---
 

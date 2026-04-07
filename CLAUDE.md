@@ -18,16 +18,16 @@ This reads the source folder's `CLAUDE.md` (if present), discovers documents, an
 
 ### 2. Run any skill
 ```
-/tax-checklist
-/check-w2s
-/check-fbar
-/check-pfic
-/foreign-tax-credit
-/check-childcare
-/rental-income
+/taxbro-checklist
+/taxbro-check-w2s
+/taxbro-check-fbar
+/taxbro-check-pfic
+/taxbro-foreign-tax-credit
+/taxbro-check-childcare
+/taxbro-rental-income
 ```
 Each skill reads `.current-session` to know where your documents are.
-You can also pass the path directly: `/check-fbar /path/to/taxes/`
+You can also pass the path directly: `/taxbro-check-fbar /path/to/taxes/`
 
 ### 0. Get an overview
 ```
@@ -81,15 +81,15 @@ When pointed at a source folder, TaxBro expects:
 |---------|---------|
 | `/taxbro` | Show all commands, session status, and output file reference |
 | `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover documents |
-| `/tax-checklist` | Full status check across all tax issues |
-| `/check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
-| `/check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
-| `/check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
-| `/foreign-tax-credit` | Consolidate foreign taxes paid → Form 1116 |
-| `/check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
-| `/rental-income` | Indian (or other foreign) rental income → Schedule E |
-| `/generate-worksheets` | Generate pre-filled IRS form worksheets (FBAR, 1116, 8621, Schedule E, 2441) ready for preparer entry |
-| `/validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents; flags discrepancies |
+| `/taxbro-checklist` | Full status check across all tax issues |
+| `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
+| `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
+| `/taxbro-check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
+| `/taxbro-foreign-tax-credit` | Consolidate foreign taxes paid → Form 1116 |
+| `/taxbro-check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
+| `/taxbro-rental-income` | Indian (or other foreign) rental income → Schedule E |
+| `/taxbro-generate-worksheets` | Generate pre-filled IRS form worksheets (FBAR, 1116, 8621, Schedule E, 2441) ready for preparer entry |
+| `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents; flags discrepancies |
 
 ---
 

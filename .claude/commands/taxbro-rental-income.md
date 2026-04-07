@@ -56,7 +56,7 @@ Steps:
    - USD conversion workings (rate used, source)
    - Schedule E income summary: gross rent, expenses, net income
    - Depreciation calculation (or flag if basis unknown)
-   - Form 1116 amount to carry to /foreign-tax-credit
+   - Form 1116 amount to carry to /taxbro-foreign-tax-credit
 
 IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/rental-income.md only.
 Never write financial data to ~/claude/taxbro/.

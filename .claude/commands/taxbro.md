@@ -7,7 +7,7 @@ TaxBro is a Claude Code assistant for analyzing US tax returns using source docu
 
 ### 2. Current session
 Read ~/claude/taxbro/.current-session.
-- If the file exists: show the loaded source folder path and note the user can run /tax-checklist to see status.
+- If the file exists: show the loaded source folder path and note the user can run /taxbro-checklist to see status.
 - If the file does not exist: note that no source folder is loaded and prompt the user to run /taxbro-init.
 
 ### 3. Available commands
@@ -16,30 +16,30 @@ Display all commands in a table with command name and purpose:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover documents |
-| `/tax-checklist` | Full status check across all tax issues |
-| `/check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
-| `/check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
-| `/check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
-| `/foreign-tax-credit` | Consolidate foreign taxes paid → Form 1116 |
-| `/check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
-| `/rental-income` | Foreign rental income → Schedule E |
-| `/generate-worksheets` | Pre-filled IRS form worksheets ready for preparer entry |
-| `/validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents |
+| `/taxbro-checklist` | Full status check across all tax issues |
+| `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
+| `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
+| `/taxbro-check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
+| `/taxbro-foreign-tax-credit` | Consolidate foreign taxes paid → Form 1116 |
+| `/taxbro-check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
+| `/taxbro-rental-income` | Foreign rental income → Schedule E |
+| `/taxbro-generate-worksheets` | Pre-filled IRS form worksheets ready for preparer entry |
+| `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents |
 
 ### 4. Output files
 All outputs are written to {SOURCE_FOLDER}/TAXBRO/. List the files that skill produces:
 
 | File | Produced by |
 |------|------------|
-| `checklist.md` | /tax-checklist |
-| `w2-summary.md` | /check-w2s |
-| `fbar-summary.md` | /check-fbar |
-| `pfic-summary.md` | /check-pfic |
-| `ftc-summary.md` | /foreign-tax-credit |
-| `childcare-summary.md` | /check-childcare |
-| `rental-income.md` | /rental-income |
-| `worksheets.md` | /generate-worksheets |
-| `validation-report.md` | /validate-return |
+| `checklist.md` | /taxbro-checklist |
+| `w2-summary.md` | /taxbro-check-w2s |
+| `fbar-summary.md` | /taxbro-check-fbar |
+| `pfic-summary.md` | /taxbro-check-pfic |
+| `ftc-summary.md` | /taxbro-foreign-tax-credit |
+| `childcare-summary.md` | /taxbro-check-childcare |
+| `rental-income.md` | /taxbro-rental-income |
+| `worksheets.md` | /taxbro-generate-worksheets |
+| `validation-report.md` | /taxbro-validate-return |
 | `session-notes.md` | /taxbro-init |
 
 ### 5. Privacy reminder

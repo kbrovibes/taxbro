@@ -4,7 +4,7 @@ Steps:
 1. Get source folder:
    - If $ARGUMENTS is provided, use that path.
    - Otherwise read ~/claude/taxbro/.current-session for the path.
-   - If neither exists, ask: "Please run /tax-init first, or pass your tax folder path as an argument."
+   - If neither exists, ask: "Please run /taxbro-init first, or pass your tax folder path as an argument."
 
 2. Read {SOURCE_FOLDER}/CLAUDE.md to understand this filer's specific situation, applicable forms, and flagged issues.
 
