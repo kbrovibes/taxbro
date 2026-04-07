@@ -25,15 +25,15 @@ filing:       <e.g. "MFJ, sole earner, dual W-2">
 cross-border: <e.g. "India (FBAR, PFIC, FTC), Canada (FBAR)"> or "none"
 snapshots:    <N archived — run /taxbro-init --reset to create another>
 outputs:
-  checklist:      <exists | missing> [last updated: YYYY-MM-DD]
-  w2:             <exists | missing> [last updated: YYYY-MM-DD]
-  fbar:           <exists | missing> [last updated: YYYY-MM-DD]
-  pfic:           <exists | missing> [last updated: YYYY-MM-DD]
-  ftc:            <exists | missing> [last updated: YYYY-MM-DD]
-  childcare:      <exists | missing> [last updated: YYYY-MM-DD]
-  rental:         <exists | missing> [last updated: YYYY-MM-DD]
-  worksheets:     <exists | missing> [last updated: YYYY-MM-DD]
-  validation:     <exists | missing> [last updated: YYYY-MM-DD]
+  US-checklist:      <exists | missing> [last updated: YYYY-MM-DD]
+  US-w2-summary:     <exists | missing> [last updated: YYYY-MM-DD]
+  US-fbar-summary:   <exists | missing> [last updated: YYYY-MM-DD]
+  US-pfic-summary:   <exists | missing> [last updated: YYYY-MM-DD]
+  US-ftc-summary:    <exists | missing> [last updated: YYYY-MM-DD]
+  US-childcare:      <exists | missing> [last updated: YYYY-MM-DD]
+  US-rental-income:  <exists | missing> [last updated: YYYY-MM-DD]
+  US-worksheets:     <exists | missing> [last updated: YYYY-MM-DD]
+  US-validation:     <exists | missing> [last updated: YYYY-MM-DD]
 next:         <one-line suggestion: e.g. "run /taxbro-checklist to start" or "all outputs present — run /taxbro-validate-return">
 ```
 
