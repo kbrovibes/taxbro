@@ -1,0 +1,28 @@
+# Session state — contains only a folder path, but gitignore for cleanliness
+.current-session
+
+# Never commit actual tax documents if they land here by mistake
+*.pdf
+*.PDF
+*.csv
+*.xlsx
+*.xls
+*.doc
+*.docx
+
+# Never commit output folders
+TAXBRO/
+
+# Environment / secrets
+.env
+.env.*
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
