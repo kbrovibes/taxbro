@@ -10,6 +10,7 @@ Steps:
 
 3. For each issue listed in CLAUDE.md (or the standard checklist below if no CLAUDE.md), check:
    a. Is the required source document present in the folder?
+      Use `find {SOURCE_FOLDER} -follow -type f` to discover all files including those reachable via symlinks.
    b. Has TaxBro already generated an output file for it in TAXBRO/?
    c. Are there any open flags or risks noted?
 

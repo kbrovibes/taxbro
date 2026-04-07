@@ -154,6 +154,10 @@ Loads a source folder and prepares TaxBro for the session.
 
 After running this, all other skills can be invoked without a path argument.
 
+**Symlinks and shortcuts:** `/taxbro-init` fully supports Unix symlinks — both on the folder itself and on files/subdirectories within it. It uses `find -follow` to recursively traverse through symlinks and discover all reachable documents. The resolved real path is stored in `.current-session` so all subsequent skills work consistently.
+
+> **macOS Finder aliases** (created via right-click > Make Alias) are *not* Unix symlinks and cannot be followed by standard tools. If you have Finder aliases in your documents folder, TaxBro will detect and warn about them. To fix: either replace them with Unix symlinks (`ln -s /path/to/real/file ~/Documents/taxes/link-name.pdf`) or copy the actual files into the folder.
+
 ---
 
 ### `/tax-checklist`

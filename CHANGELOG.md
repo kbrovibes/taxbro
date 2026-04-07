@@ -5,6 +5,18 @@ Format: `## [date] — description`, with details on what changed and why.
 
 ---
 
+## [2026-04-07] — Symlink support in /taxbro-init and document discovery
+
+### Changed
+- **`/taxbro-init`**: now resolves symlinks on the folder path itself using `realpath`; stores the real resolved path in `.current-session` so all subsequent skills work consistently
+- **`/taxbro-init`**: document discovery now uses `find -follow` to recursively traverse into symlinked subdirectories and follow symlinked files, discovering all documents reachable from the source folder regardless of how they're linked
+- **`/tax-checklist`**: document presence checks now use `find -follow` for consistency
+- **`/taxbro-init`**: detects macOS Finder alias files (`.alias`), which are not Unix symlinks and cannot be followed — warns user to replace with `ln -s` or copy the actual files
+- **`/taxbro-init`**: session-notes.md now records both original and resolved paths when they differ
+- **README**: added symlink/alias guidance in the `/taxbro-init` section
+
+---
+
 ## [2026-04-07] — Initial release + project restructuring
 
 ### Added
