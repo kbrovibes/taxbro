@@ -25,16 +25,17 @@ filing:       <e.g. "MFJ, sole earner, dual W-2">
 cross-border: <e.g. "India (FBAR, PFIC, FTC), Canada (FBAR)"> or "none"
 snapshots:    <N archived — run /taxbro-init --reset to create another>
 outputs:
-  US-checklist:      <exists | missing> [last updated: YYYY-MM-DD]
-  US-w2-summary:     <exists | missing> [last updated: YYYY-MM-DD]
-  US-fbar-summary:   <exists | missing> [last updated: YYYY-MM-DD]
-  US-pfic-summary:   <exists | missing> [last updated: YYYY-MM-DD]
-  US-ftc-summary:    <exists | missing> [last updated: YYYY-MM-DD]
-  US-childcare:      <exists | missing> [last updated: YYYY-MM-DD]
-  US-rental-income:  <exists | missing> [last updated: YYYY-MM-DD]
-  US-worksheets:     <exists | missing> [last updated: YYYY-MM-DD]
-  US-validation:     <exists | missing> [last updated: YYYY-MM-DD]
-next:         <one-line suggestion: e.g. "run /taxbro-checklist to start" or "all outputs present — run /taxbro-validate-return">
+  US-knowledge-graph: <exists | missing> [last updated: YYYY-MM-DD]
+  US-checklist:       <exists | missing> [last updated: YYYY-MM-DD]
+  US-w2-summary:      <exists | missing> [last updated: YYYY-MM-DD]
+  US-fbar-summary:    <exists | missing> [last updated: YYYY-MM-DD]
+  US-pfic-summary:    <exists | missing> [last updated: YYYY-MM-DD]
+  US-ftc-summary:     <exists | missing> [last updated: YYYY-MM-DD]
+  US-childcare:       <exists | missing> [last updated: YYYY-MM-DD]
+  US-rental-income:   <exists | missing> [last updated: YYYY-MM-DD]
+  US-worksheets:      <exists | missing> [last updated: YYYY-MM-DD]
+  US-validation:      <exists | missing> [last updated: YYYY-MM-DD]
+next:         <one-line suggestion: e.g. "run /taxbro-extract to build knowledge graph" or "all outputs present — run /taxbro-validate-return">
 ```
 
 Use `stat -f "%Sm" -t "%Y-%m-%d"` (macOS) to get mtime. If stat fails, omit the date.
@@ -62,7 +63,8 @@ Display all commands in a table with command name and purpose:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover documents |
-| `/taxbro-checklist` | Full status check across all tax issues |
+| `/taxbro-extract` | **Read all documents → build US-knowledge-graph.md** (run this first) |
+| `/taxbro-checklist` | Full status check and topic-by-topic review (reads knowledge graph) |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
 | `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
 | `/taxbro-check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
@@ -77,6 +79,7 @@ All outputs are written to {SOURCE_FOLDER}/TAXBRO/. List the files that skill pr
 
 | File | Produced by |
 |------|------------|
+| `US-knowledge-graph.md` | /taxbro-extract (primary data source for all analysis) |
 | `US-checklist.md` | /taxbro-checklist |
 | `US-w2-summary.md` | /taxbro-check-w2s |
 | `US-fbar-summary.md` | /taxbro-check-fbar |

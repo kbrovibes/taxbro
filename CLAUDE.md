@@ -87,8 +87,8 @@ When pointed at a source folder, TaxBro expects:
 ### What TaxBro writes to `{SOURCE_FOLDER}/TAXBRO/`:
 | File | Contents |
 |------|----------|
-| `file-index.md` | Full knowledge graph: all source files, categories, inferred types, sizes, change log |
-| `US-checklist.md` | Status of all key tax issues |
+| `US-knowledge-graph.md` | Extracted facts from all documents: income, accounts, taxes, flags, cross-checks |
+| `US-checklist.md` | Status of all key tax issues (reads knowledge graph when available) |
 | `US-fbar-summary.md` | Foreign account balances table for FinCEN 114 |
 | `US-pfic-summary.md` | PFIC fund list, distribution check, Form 8621 determination |
 | `US-ftc-summary.md` | Foreign taxes paid, Form 1116 basket breakdown |
@@ -106,8 +106,9 @@ When pointed at a source folder, TaxBro expects:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro` | Show all commands, session status, and output file reference |
-| `/taxbro-init [path]` | Load source folder, build file index + knowledge graph; `--refresh` to reindex; `--reset` to snapshot outputs and start fresh |
-| `/taxbro-checklist` | Full status check across all tax issues |
+| `/taxbro-init [path]` | Load source folder, discover documents; `--reset` to snapshot outputs and start fresh |
+| `/taxbro-extract` | Read all documents → build `US-knowledge-graph.md` (run after init, before checklist) |
+| `/taxbro-checklist` | Full status review — reads knowledge graph + flags items for attention |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
 | `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
 | `/taxbro-check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
