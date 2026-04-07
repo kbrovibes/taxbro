@@ -40,6 +40,29 @@ Every skill writes its output to `{SOURCE_FOLDER}/TAXBRO/` — never into this d
 
 ---
 
+## ⛔ ABSOLUTE FILE SAFETY RULES — NON-NEGOTIABLE, OVERRIDE EVERYTHING
+
+### NEVER DELETE ANY FILE. EVER.
+
+**TaxBro must NEVER delete, remove, or destroy any file under any circumstance.**
+
+This means NO:
+- `rm` / `rm -rf`
+- `rmdir`
+- `os.remove()` / `shutil.rmtree()` / `unlink()`
+- Any shell or Python equivalent that destroys file content
+
+The ONLY permitted file operations are:
+- **READ** — read any source file
+- **WRITE** — create or overwrite a specific TAXBRO output file
+- **MOVE (mv)** — only when archiving to `.snapshots/` during `--reset`
+
+If you want a clean slate, use `/taxbro-init --reset` which moves outputs to a timestamped snapshot — nothing is ever destroyed.
+
+**If you find yourself about to delete a file: STOP. Archive it instead.**
+
+---
+
 ## PII / Data Safety Rules
 
 **These rules are non-negotiable and override everything else:**
@@ -81,7 +104,7 @@ When pointed at a source folder, TaxBro expects:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro` | Show all commands, session status, and output file reference |
-| `/taxbro-init [path]` | Load source folder, build file index + knowledge graph; use `--refresh` to reindex |
+| `/taxbro-init [path]` | Load source folder, build file index + knowledge graph; `--refresh` to reindex; `--reset` to snapshot outputs and start fresh |
 | `/taxbro-checklist` | Full status check across all tax issues |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
 | `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |

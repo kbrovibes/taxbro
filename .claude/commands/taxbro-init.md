@@ -1,12 +1,46 @@
 Initialize TaxBro with a source tax documents folder.
 
-Usage: /taxbro-init /path/to/tax/folder/
+Usage:
+  /taxbro-init /path/to/tax/folder/           — full initialization
+  /taxbro-init /path/to/tax/folder/ --reset   — snapshot existing outputs, then fresh init
+  /taxbro-init --reset                        — snapshot + reset using current session path
+
+Flags:
+  --reset   (also accepted: --remove)
+            Move all current TAXBRO/ output files into a timestamped snapshot directory
+            at {SOURCE_FOLDER}/TAXBRO/.snapshots/YYYY-MM-DD-HHMMSS/ before reinitializing.
+            Nothing is ever deleted. Snapshots are preserved indefinitely.
+            Skills never read from .snapshots/ — it is treated as archived output only.
+
+⚠️ ABSOLUTE RULE: TaxBro NEVER deletes any file, EVER. Not source documents, not outputs,
+not snapshots, not anything. The only file operations permitted are: READ and WRITE (create
+or overwrite a specific output file). If you find yourself about to run rm, unlink, rmdir,
+or any deletion command — STOP. Use --reset to archive outputs instead.
 
 Steps:
-1. The source folder path is: $ARGUMENTS
-   If no argument was provided, ask the user: "Please provide the path to your tax documents folder."
+1. Parse $ARGUMENTS:
+   - RESET_MODE = true if "--reset" or "--remove" is present in $ARGUMENTS
+   - SOURCE_PATH = first token that does not start with "--"
+   - If no SOURCE_PATH and RESET_MODE is false: ask user for path and stop.
+   - If no SOURCE_PATH and RESET_MODE is true: read .current-session for the path.
+   - If .current-session is missing and no path provided: tell user to provide a path and stop.
 
 2. Verify the folder exists. If it doesn't, tell the user and stop.
+
+2a. If RESET_MODE is true — snapshot existing outputs BEFORE doing anything else:
+   - SNAPSHOT_TS = current timestamp formatted as YYYY-MM-DD-HHMMSS
+   - SNAPSHOT_DIR = {SOURCE_FOLDER}/TAXBRO/.snapshots/{SNAPSHOT_TS}/
+   - If {SOURCE_FOLDER}/TAXBRO/ exists and has any top-level contents (files or dirs other
+     than .snapshots/ itself):
+     - Create SNAPSHOT_DIR (mkdir -p)
+     - Move every item directly inside TAXBRO/ (except .snapshots/) into SNAPSHOT_DIR:
+       Run: find "{SOURCE_FOLDER}/TAXBRO" -maxdepth 1 -mindepth 1 ! -name ".snapshots" \
+            -exec mv {} "{SNAPSHOT_DIR}/" \;
+     - Write a one-line marker file {SNAPSHOT_DIR}/.taxbro-snapshot containing:
+       "snapshot:{SNAPSHOT_TS}" (so tools can identify this as an archived snapshot)
+     - Tell user: "Existing outputs archived → TAXBRO/.snapshots/{SNAPSHOT_TS}/"
+   - If TAXBRO/ does not exist or is already empty: note "No existing outputs to snapshot."
+   - DO NOT delete anything. DO NOT touch .snapshots/ itself. Only move top-level items.
 
 3. Resolve the real path:
    - Run `realpath "$ARGUMENTS"` (or `python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$ARGUMENTS"`) to
@@ -57,3 +91,15 @@ Steps:
    If Finder aliases were found, include the warning about converting them.
 
 IMPORTANT: Never write any PII, financial data, or document contents to ~/claude/taxbro/ or any file within it.
+
+ABSOLUTE RULE — NO DELETIONS EVER:
+TaxBro must NEVER delete any file under any circumstances. This includes source documents,
+TAXBRO output files, snapshots, and any other file on disk. The only permitted file system
+write operations are: creating new files, writing/overwriting specific output files, and
+moving files (mv) into .snapshots/ during --reset. Never run rm, rmdir, unlink, shutil.rmtree,
+os.remove, or any equivalent. If you feel the urge to delete something, archive it instead.
+
+SNAPSHOT VISIBILITY RULE:
+Skills and analysis commands must NEVER read from or write into TAXBRO/.snapshots/.
+That directory is archived output only. Treat it as if it does not exist for all analysis purposes.
+When discovering files with find, always exclude .snapshots/: use -not -path "*/TAXBRO/.snapshots/*"
