@@ -49,7 +49,7 @@ Steps:
    - Annual depreciation = basis ÷ 30
    - Flag if depreciation basis has not been established (common oversight for foreign property)
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/rental-income.md:
+8. Write output to {SOURCE_FOLDER}/TAXBRO/US-rental-income.md:
    - Property description (city/country, ownership %)
    - Monthly rent table (INR) with annual total
    - TDS deducted
@@ -58,5 +58,5 @@ Steps:
    - Depreciation calculation (or flag if basis unknown)
    - Form 1116 amount to carry to /taxbro-foreign-tax-credit
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/rental-income.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-rental-income.md only.
 Never write financial data to ~/claude/taxbro/.

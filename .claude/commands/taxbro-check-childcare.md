@@ -34,12 +34,12 @@ Steps:
    - At AGI > $43,000 (2025): rate is 20%
    - Estimate credit = net qualifying expenses × 20% (conservative for higher-income filers)
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/childcare-summary.md:
+8. Write output to {SOURCE_FOLDER}/TAXBRO/US-childcare-summary.md:
    - Table: Provider | EIN | Amount Paid | Qualifying Amount
    - DCFSA offset calculation
    - Net qualifying expenses
    - Estimated credit (with earned-income caveat if applicable)
    - Form 2441 eligibility determination and any flags
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/childcare-summary.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-childcare-summary.md only.
 Never write financial data to ~/claude/taxbro/.

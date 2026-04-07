@@ -30,9 +30,9 @@ Standard checklist items (adapt based on CLAUDE.md):
 
 4. Output a status table with three columns: Issue | Documents Present | Analysis Done | Risk/Flag
 
-5. Write the output to {SOURCE_FOLDER}/TAXBRO/checklist.md with today's date as header.
+5. Write the output to {SOURCE_FOLDER}/TAXBRO/US-checklist.md with today's date as header.
 
 6. Summarize: how many items are ✅ clear, ⚠️ need attention, ❌ blocked by missing documents.
 
 IMPORTANT: Never write any PII, account numbers, or financial figures to ~/claude/taxbro/.
-All output goes to {SOURCE_FOLDER}/TAXBRO/checklist.md only.
+All output goes to {SOURCE_FOLDER}/TAXBRO/US-checklist.md only.

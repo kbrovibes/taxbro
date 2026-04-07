@@ -43,11 +43,11 @@ Steps:
    - Excess FTC carries forward 10 years
    - Flag if India taxes likely exceed the FTC limitation (common for high-bracket US filers)
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/ftc-summary.md:
+8. Write output to {SOURCE_FOLDER}/TAXBRO/US-ftc-summary.md:
    - Table per item: Country | Income Type | Gross Income (USD) | Foreign Tax (USD) | Basket | Source Doc
    - Subtotals by basket
    - Form 1116 filing recommendation
    - Any carryforward notes
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/ftc-summary.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-ftc-summary.md only.
 Never write financial data to ~/claude/taxbro/.

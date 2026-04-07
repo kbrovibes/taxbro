@@ -1,5 +1,10 @@
 Initialize TaxBro with a source tax documents folder.
 
+**Scope: US Federal Tax Returns only (Form 1040 + international schedules).**
+Foreign income, accounts, and taxes from any country are included only insofar as they are
+reportable on a US return (Schedule E, Form 1116, FBAR, Form 8938, Form 8621, etc.).
+All output files are prefixed with "US-" to make this scope explicit.
+
 Usage:
   /taxbro-init /path/to/tax/folder/           — full initialization
   /taxbro-init /path/to/tax/folder/ --reset   — snapshot existing outputs, then fresh init

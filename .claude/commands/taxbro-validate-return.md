@@ -26,8 +26,8 @@ Steps:
    - Any state returns
 
 4. Also read all TaxBro analysis outputs that exist in {SOURCE_FOLDER}/TAXBRO/:
-   w2-summary.md, fbar-summary.md, ftc-summary.md, pfic-summary.md,
-   rental-income.md, childcare-summary.md, worksheets.md
+   US-w2-summary.md, US-fbar-summary.md, US-ftc-summary.md, US-pfic-summary.md,
+   US-rental-income.md, US-childcare-summary.md, US-worksheets.md
 
 5. Run the following validations. For each check, record:
    - PASS ✅ — numbers match within rounding tolerance ($1–2)
@@ -52,18 +52,18 @@ VALIDATION CHECKS:
 - [ ] Part III: foreign accounts disclosed — check that all accounts in FBAR match Schedule B Part III
 
 **Schedule E (rental)**
-- [ ] Gross rents received: return value vs rental-income.md USD amount
-- [ ] Depreciation: return value vs depreciation calculated in rental-income.md
-- [ ] Foreign taxes on rental: matches ftc-summary.md rental TDS entry
+- [ ] Gross rents received: return value vs US-rental-income.md USD amount
+- [ ] Depreciation: return value vs depreciation calculated in US-rental-income.md
+- [ ] Foreign taxes on rental: matches US-ftc-summary.md rental TDS entry
 
 **Form 1116 — Passive Basket**
-- [ ] Foreign income (Line 9): matches sum of NRO interest + foreign dividends + rental (if passive) from ftc-summary.md
+- [ ] Foreign income (Line 9): matches sum of NRO interest + foreign dividends + rental (if passive) from US-ftc-summary.md
 - [ ] Foreign taxes (Lines 2–5): matches total TDS on NRO accounts from interest certificates
 - [ ] Correct basket used (passive vs general): NRO interest → passive
 
 **Form 1116 — General Basket (if present)**
 - [ ] Advance tax payments included: matches ₹75,000 (or whatever total) from advance tax payment docs
-- [ ] Rental income taxes (if active): matches TDS on rental from ftc-summary.md
+- [ ] Rental income taxes (if active): matches TDS on rental from US-ftc-summary.md
 
 **Form 2441 (childcare)**
 - [ ] Provider names + EINs: match childcare provider statements
@@ -73,18 +73,18 @@ VALIDATION CHECKS:
 
 **Form 8938 (FATCA)**
 - [ ] All foreign accounts listed: cross-reference with FBAR account list
-- [ ] Max values: within range of fbar-summary.md figures
+- [ ] Max values: within range of US-fbar-summary.md figures
 - [ ] Foreign financial assets (mutual funds) included if PFIC holdings above threshold
 
 **Form 8621 (PFIC)**
 - [ ] One form per fund with reportable activity
-- [ ] Fund names match CAMS CAS / pfic-summary.md
+- [ ] Fund names match CAMS CAS / US-pfic-summary.md
 - [ ] If no distributions and no elections: Section 1298(f) annual reporting confirmed
 - [ ] No phantom income reported for funds with no distributions (under default method)
 
 **W-2 / Excess SS**
 - [ ] If excess SS withheld: credit appears on Form 1040 Schedule 3 Line 11
-- [ ] Amount matches w2-summary.md excess SS calculation
+- [ ] Amount matches US-w2-summary.md excess SS calculation
 
 **HSA**
 - [ ] Form 8889 present if HSA distributions taken
@@ -92,7 +92,7 @@ VALIDATION CHECKS:
 
 ---
 
-6. Write output to {SOURCE_FOLDER}/TAXBRO/validation-report.md:
+6. Write output to {SOURCE_FOLDER}/TAXBRO/US-validation-report.md:
    - Header: return filename validated, date of validation, tax year
    - Results table: Form/Line | Return Value | Source Value | Source Document | Status
    - Summary: N passed, N flagged, N mismatched, N skipped
@@ -101,5 +101,5 @@ VALIDATION CHECKS:
 
 7. Print a brief summary to the user: total checks run, pass/flag/mismatch counts, and top issues to review.
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/validation-report.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-validation-report.md only.
 Never write financial data to ~/claude/taxbro/.

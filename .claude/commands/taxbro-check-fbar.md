@@ -35,12 +35,12 @@ Steps:
    - NRE: interest tax-free in India, but TAXABLE in US — must be reported on Schedule B
    - NRO: interest taxable in India (TDS withheld) + taxable in US — Form 1116 credit available
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/fbar-summary.md:
+8. Write output to {SOURCE_FOLDER}/TAXBRO/US-fbar-summary.md:
    - Table per account: Institution | Country | Type | Currency | Max Balance (local) | Max Balance (USD) | Dec 31 Balance (USD)
    - FBAR filing determination (required / not required)
    - Form 8938 filing determination (required / not required)
    - List of accounts to include on Schedule B Part III
    - Flag any account where statement is missing or balance unclear
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/fbar-summary.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-fbar-summary.md only.
 Never write financial data to ~/claude/taxbro/.

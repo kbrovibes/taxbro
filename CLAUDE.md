@@ -1,8 +1,10 @@
 # TaxBro — Claude Tax Analysis Assistant
 
 ## What this is
-A Claude Code project for analyzing US tax returns using source documents.
+A Claude Code project for **preparing and validating US Federal Tax Returns** (Form 1040 + international schedules).
 Generic enough to work for any filer; personalized through the source folder's own `CLAUDE.md`.
+
+**Current scope: US returns only.** Foreign income, accounts, and taxes from any country are used only as inputs to US reporting requirements (Schedule E, Form 1116, FBAR, Form 8938, Form 8621, etc.). All analysis output files are prefixed with `US-`.
 
 **This folder may be published as a public GitHub repo. No PII, no tax data, no document contents, no account numbers ever belong here.**
 
@@ -86,15 +88,15 @@ When pointed at a source folder, TaxBro expects:
 | File | Contents |
 |------|----------|
 | `file-index.md` | Full knowledge graph: all source files, categories, inferred types, sizes, change log |
-| `checklist.md` | Status of all key tax issues |
-| `fbar-summary.md` | Foreign account balances table for FinCEN 114 |
-| `pfic-summary.md` | PFIC fund list, distribution check, Form 8621 determination |
-| `ftc-summary.md` | Foreign taxes paid, Form 1116 basket breakdown |
-| `w2-summary.md` | W-2 analysis, excess SS check, DCFSA amounts |
-| `childcare-summary.md` | Childcare expenses, Form 2441 eligibility |
-| `rental-income.md` | Rental income INR→USD conversion, Schedule E summary |
-| `worksheets.md` | Pre-filled line-item worksheets for all applicable IRS forms |
-| `validation-report.md` | Cross-check of completed return vs source documents |
+| `US-checklist.md` | Status of all key tax issues |
+| `US-fbar-summary.md` | Foreign account balances table for FinCEN 114 |
+| `US-pfic-summary.md` | PFIC fund list, distribution check, Form 8621 determination |
+| `US-ftc-summary.md` | Foreign taxes paid, Form 1116 basket breakdown |
+| `US-w2-summary.md` | W-2 analysis, excess SS check, DCFSA amounts |
+| `US-childcare-summary.md` | Childcare expenses, Form 2441 eligibility |
+| `US-rental-income.md` | Rental income INR→USD conversion, Schedule E summary |
+| `US-worksheets.md` | Pre-filled line-item worksheets for all applicable IRS forms |
+| `US-validation-report.md` | Cross-check of completed return vs source documents |
 | `session-notes.md` | Freeform notes from analysis sessions |
 
 ---

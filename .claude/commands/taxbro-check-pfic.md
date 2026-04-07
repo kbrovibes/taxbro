@@ -34,12 +34,12 @@ Steps:
    - Switching to QEF requires a "purging election" — significant tax catch-up cost; flag if considering
    - MTM election: simpler annually but requires unrealized gain/loss each year
 
-8. Write output to {SOURCE_FOLDER}/TAXBRO/pfic-summary.md:
+8. Write output to {SOURCE_FOLDER}/TAXBRO/US-pfic-summary.md:
    - Table: Fund Name | AMC | Units | Dec 31 NAV (INR) | Dec 31 Value (INR) | Dec 31 Value (USD) | Redemptions This Year | Form 8621 Required
    - Total portfolio USD value
    - De minimis determination
    - Recommended action per fund
    - Election status and recommendation
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/pfic-summary.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-pfic-summary.md only.
 Never write financial data to ~/claude/taxbro/.

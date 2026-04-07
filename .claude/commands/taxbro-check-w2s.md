@@ -24,7 +24,7 @@ Steps:
    c. Sum Box 12 code W (HSA employer contributions) → needed for HSA limit check
    d. Check if CLAUDE.md notes spouse has no earned income → flag Form 2441 risk
 
-5. Write output to {SOURCE_FOLDER}/TAXBRO/w2-summary.md:
+5. Write output to {SOURCE_FOLDER}/TAXBRO/US-w2-summary.md:
    - Table: Employer | Box1 Wages | Box2 Fed Withheld | Box4 SS | Box10 DCFSA
    - Excess SS calculation (if applicable)
    - Form 2441 earned-income flag (if applicable)

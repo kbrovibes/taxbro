@@ -3,7 +3,9 @@ Show a full overview of the TaxBro project — what it is, all available command
 ## What to display
 
 ### 1. Project description
-TaxBro is a Claude Code assistant for analyzing US tax returns using source documents. It reads PDFs and statements from a source folder, runs analysis against IRS rules, and writes summaries to {SOURCE_FOLDER}/TAXBRO/. No personal data ever touches the taxbro repo directory.
+TaxBro is a Claude Code assistant for preparing and validating **US Federal Tax Returns** (Form 1040 + international schedules). It reads PDFs and statements from a source folder, runs analysis against IRS rules, and writes summaries to {SOURCE_FOLDER}/TAXBRO/. No personal data ever touches the taxbro repo directory.
+
+**Current scope: US returns only.** Foreign income, accounts, and taxes from any country are included only as they are reportable on a US return. All analysis output files are prefixed with `US-`.
 
 ### 2. Current session
 Read .current-session.
@@ -31,15 +33,15 @@ All outputs are written to {SOURCE_FOLDER}/TAXBRO/. List the files that skill pr
 
 | File | Produced by |
 |------|------------|
-| `checklist.md` | /taxbro-checklist |
-| `w2-summary.md` | /taxbro-check-w2s |
-| `fbar-summary.md` | /taxbro-check-fbar |
-| `pfic-summary.md` | /taxbro-check-pfic |
-| `ftc-summary.md` | /taxbro-foreign-tax-credit |
-| `childcare-summary.md` | /taxbro-check-childcare |
-| `rental-income.md` | /taxbro-rental-income |
-| `worksheets.md` | /taxbro-generate-worksheets |
-| `validation-report.md` | /taxbro-validate-return |
+| `US-checklist.md` | /taxbro-checklist |
+| `US-w2-summary.md` | /taxbro-check-w2s |
+| `US-fbar-summary.md` | /taxbro-check-fbar |
+| `US-pfic-summary.md` | /taxbro-check-pfic |
+| `US-ftc-summary.md` | /taxbro-foreign-tax-credit |
+| `US-childcare-summary.md` | /taxbro-check-childcare |
+| `US-rental-income.md` | /taxbro-rental-income |
+| `US-worksheets.md` | /taxbro-generate-worksheets |
+| `US-validation-report.md` | /taxbro-validate-return |
 | `session-notes.md` | /taxbro-init |
 
 ### 5. Privacy reminder

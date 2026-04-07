@@ -7,19 +7,19 @@ Steps:
 2. Read CLAUDE.md to understand which forms apply to this filer.
 
 3. Check which TaxBro analysis outputs already exist in {SOURCE_FOLDER}/TAXBRO/:
-   - fbar-summary.md → drives FinCEN 114 worksheet
-   - ftc-summary.md → drives Form 1116 worksheets
-   - pfic-summary.md → drives Form 8621 worksheets
-   - rental-income.md → drives Schedule E worksheet
-   - w2-summary.md → drives Form 1040 wages section + excess SS credit
-   - childcare-summary.md → drives Form 2441 worksheet
+   - US-fbar-summary.md → drives FinCEN 114 worksheet
+   - US-ftc-summary.md → drives Form 1116 worksheets
+   - US-pfic-summary.md → drives Form 8621 worksheets
+   - US-rental-income.md → drives Schedule E worksheet
+   - US-w2-summary.md → drives Form 1040 wages section + excess SS credit
+   - US-childcare-summary.md → drives Form 2441 worksheet
 
    For any missing analysis file, run the corresponding skill first and notify the user:
    "Missing [skill output] — please run /[skill] first, then re-run /generate-worksheets."
    Continue generating worksheets for forms where analysis is already complete.
 
 4. Generate the following worksheets as applicable. Write each as a clearly labeled section
-   in {SOURCE_FOLDER}/TAXBRO/worksheets.md:
+   in {SOURCE_FOLDER}/TAXBRO/US-worksheets.md:
 
 ---
 
@@ -89,7 +89,7 @@ Per property:
 - Line 12: Other interest
 - Line 13: Repairs
 - Line 16: Taxes (India property tax if paid)
-- Line 18: Depreciation (from rental-income.md calculation)
+- Line 18: Depreciation (from US-rental-income.md calculation)
 - Line 19: Other expenses
 - Line 21: Total expenses
 - Line 22: Net income / (loss)
@@ -127,7 +127,7 @@ Part II:
 
 ---
 
-5. At the end of worksheets.md, add a "What your preparer still needs to fill in" section:
+5. At the end of US-worksheets.md, add a "What your preparer still needs to fill in" section:
    - US tax before credits (Line 16 of 1040) — needed to finalize Form 1116 limitation
    - AGI — needed to finalize Form 2441 credit rate
    - Capital gains detail (short vs long term) — from 1099-B Schedule D
@@ -135,5 +135,5 @@ Part II:
 
 6. Print a summary of which worksheets were generated and which were skipped (missing analysis).
 
-IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/worksheets.md only.
+IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-worksheets.md only.
 Never write financial data to ~/claude/taxbro/.
