@@ -14,9 +14,12 @@ Opens in any browser. Self-contained — no server required.
 ## Steps
 
 1. Read `.current-session` → SOURCE_FOLDER.
-2. Read `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.md` — this is the primary data source.
+2. Read `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.md` — primary data source.
 3. Read `{SOURCE_FOLDER}/TAXBRO/file-index.md` if it exists.
-4. Extract the following structured data from the knowledge graph:
+4. **Read `{SOURCE_FOLDER}/TAXBRO/US-validation-report.md` if it exists.**
+   This file contains return-specific figures (filed values per form/line) and validation
+   check results (PASS/FLAG/MISMATCH). Use it to populate the "Return Δ" tab.
+5. Extract the following structured data from the knowledge graph:
    - Issues & Flags table (severity, area, issue, detail)
    - Identity fields (tax year, filing status, filers, residency)
    - W-2 wages table
@@ -29,8 +32,15 @@ Opens in any browser. Self-contained — no server required.
    - FTC summary (basket, income, taxes)
    - Prior year carryforwards
    - Source document registry (file, category, status)
-
-5. Write a self-contained HTML file to `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.html`.
+6. Extract the following from US-validation-report.md (if present):
+   - Filed return name, preparer, date
+   - Validation results table: form/line, return value, source value, status (PASS/FLAG/MISMATCH)
+   - Flagged items detail
+   - Items to confirm with preparer
+7. Build a `return_vs_source` array pairing source-document values with filed return values.
+   For each row include: form, description, source_label, ret_label, source (number), ret (number|null),
+   delta_na (bool — true when delta is not meaningful e.g. gross vs. taxable), status, note.
+8. Write a self-contained HTML file to `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.html`.
 
 ---
 
@@ -45,49 +55,62 @@ The dashboard should be a single self-contained HTML file (no external files nee
 
 **Left sidebar (fixed, ~240px):**
 - App title "TaxBro" with tax year badge
-- Navigation links: Overview, Issues, Documents, Income, Accounts, PFIC, Graph
+- Navigation links: Overview, Issues, Return Δ, Documents, Income, Accounts, PFIC, Graph
 - Issue count badges by severity (🔴 N critical, ⚠️ N attention)
+- Return validation summary: N pass / N flag / N mismatch
 - "Generated: YYYY-MM-DD" footer
 
 **Main content area (scrollable, tabbed):**
 
 #### Tab 1 — Overview
-- Summary cards row: Total Income (W-2 + interest + CG), Total Tax, Effective Rate, Balance Due, FTC Claimed
-- Cross-border exposure cards: India (FBAR ✓, PFIC ⚠️, FTC), Canada (FBAR ✓, FTC ✓)
-- Top issues (first 3 critical flags in red cards)
-- Output files status grid (knowledge graph, checklist, FBAR, PFIC, etc.)
+- Summary cards row: Total Income (W-2 + interest + CG), FTC Claimed, Balance Due, PFIC Gap
+- Cross-border exposure cards: India (FBAR ✓, PFIC ⚠️, FTC, NRE gap), Canada (FBAR ✓, FTC ✓)
+- Top issues (first 3–6 critical flags in red cards)
+- Output files status grid (knowledge graph, validation, checklist, FBAR, PFIC, etc.)
 
 #### Tab 2 — Issues & Flags
 - Full flags table, filterable by severity
 - Each row: severity badge, area tag, issue summary, detail (expandable)
 - Color coding: 🔴 = red bg, ⚠️ = amber bg, ℹ️ = blue bg
 
-#### Tab 3 — Documents
+#### Tab 3 — Return Δ (NEW — requires US-validation-report.md)
+- Header: return filename, preparer, date validated
+- Summary row: N ✅ PASS / N ⚠️ FLAG / N ❌ MISMATCH
+- Full delta table with columns: Form/Line | Source Value | Return Value | Δ | Status | Note (expandable)
+  - Green row: PASS
+  - Amber row: FLAG (difference worth investigating)
+  - Red row: MISMATCH (clear discrepancy)
+  - Gray: SKIP (no data for comparison)
+- Delta column: signed dollar amount (+$X / -$X); "—" when delta_na = true; "Not Filed" when ret = null
+- "Items to confirm with preparer" callout section at bottom
+- If US-validation-report.md is absent: show a message prompting user to run /taxbro-validate-return
+
+#### Tab 4 — Documents
 - Searchable/filterable document registry table
 - Columns: File, Category, Status (✓/✗/⚠️), Notes
 - Status colors: green = extracted, red = not read, amber = flagged
 - Click row to expand notes
 
-#### Tab 4 — Income
-- W-2 wages card (employer, wages, withholding)
-- Interest income breakdown (US + India, side by side)
-- Capital gains summary (ST/LT, proceeds/basis/net)
+#### Tab 5 — Income
+- W-2 wages card (employer, wages, withholding) — show return value inline where available
+- Interest income breakdown (US + India, side by side) — show return line 2b alongside sources
+- Capital gains summary (ST/LT, proceeds/basis/net) — show return line 7
 - 1099-DIV summary
-- HSA and IRA rows
+- HSA and IRA rows — note if form absent from return
 
-#### Tab 5 — Accounts (FBAR/8938)
+#### Tab 6 — Accounts (FBAR/8938)
 - Foreign accounts table: institution, type, owner, max bal, Dec 31 bal (USD)
 - FBAR threshold indicator (aggregate max vs $10K threshold)
 - Form 8938 threshold indicator (year-end vs $100K/$200K)
 - Visual: horizontal bar chart of account max balances
 
-#### Tab 6 — PFIC
+#### Tab 7 — PFIC
 - Fund table: fund name, AMC, owner, units, Dec 31 value, redemptions, dividends
 - Aggregate value vs $25K threshold (progress bar)
 - Per-fund threshold check
 - Action required: Form 8621 count
 
-#### Tab 7 — Graph (Network)
+#### Tab 8 — Graph (Network)
 - vis-network graph showing document → tax topic relationships
 - Nodes: source documents (color by status), tax topics/forms (color by flag status)
 - Edges: document contributes to → form/topic
@@ -95,14 +118,15 @@ The dashboard should be a single self-contained HTML file (no external files nee
 - Legend: document types, form types, flag status
 
 Node types and colors:
-- Source document: slate-600 (unread), green-700 (read ✓), amber-700 (flagged ⚠️), red-700 (missing ✗)
-- US form / schedule: blue-700
-- Foreign form: purple-700
-- Issue: red-600
+- Source document (read ✓): #166534 (green-800)
+- Source document (flagged ⚠️): #92400e (amber-800)
+- Source document (not read ✗): #475569 (slate-600)
+- US form / schedule: #1e40af (blue-800)
+- Foreign form: #581c87 (purple-900)
+- Missing form (❌): #7f1d1d (red-900)
 
 Edge example connections to build:
 - W-2 → Form 1040 Line 1a
-- W-2 → Schedule 3 (excess SS check)
 - T4 → Form 1116 General
 - Fidelity 1099 → Schedule B, Schedule D, Form 8949
 - Marcus 1099-INT → Schedule B
@@ -118,17 +142,15 @@ Edge example connections to build:
 - 1099-SA → Form 8889 (MISSING ⚠️)
 - 1099-R → Form 8606
 - Cost sheets → Schedule E depreciation
-- Sale deed → Schedule E (purchase confirmed, not sale)
 
 ---
 
 ## Code Quality Requirements
 
-- All data is embedded as a JSON object in a `<script>` block at the top
+- All data is embedded as a JSON object (`TAX_DATA`) in a `<script>` block at the top
 - No external file dependencies (CSS and JS from CDN only)
 - Works when opened via file:// protocol (no CORS issues)
 - Responsive layout (works on MacBook screen)
-- Keyboard navigation: Tab between sections, Escape to close modals
 - Each tab content is rendered from the embedded JSON — not hardcoded HTML strings
 - Include a "Copy data as JSON" button for debugging
 - Footer: "Generated by TaxBro on {date} | /taxbro-visualize"
@@ -136,4 +158,6 @@ Edge example connections to build:
 ---
 
 ## Privacy Note
-The HTML file will contain financial figures extracted from the knowledge graph. It is written to the source folder (not the taxbro repo) and should be treated with the same care as other tax documents. Never commit this file to git.
+The HTML file will contain financial figures extracted from the knowledge graph and validation
+report. It is written to the source folder (not the taxbro repo) and should be treated with the
+same care as other tax documents. Never commit this file to git.
