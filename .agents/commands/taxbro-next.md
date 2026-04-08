@@ -41,21 +41,21 @@ Status indicators:
 [-] = Not Applicable (e.g., category not found in Knowledge Graph)
 [?] = Unknown (needs /taxbro-extract to determine)
 
-| Step | Command | Status | Artifact |
-|:---|:---|:---:|:---|
-| 1. Initialize | /taxbro-init | [ ] | session-notes.md |
-| 2. Extract Data | /taxbro-extract | [ ] | US-knowledge-graph.md |
-| 3. Status Review | /taxbro-checklist | [ ] | US-checklist.md |
-| 4. Specific Analysis | | | |
-|    - W-2 Wages | /taxbro-check-w2s | [ ] | US-w2-summary.md |
-|    - FBAR/Foreign | /taxbro-check-fbar | [ ] | US-fbar-summary.md |
-|    - PFIC/Funds | /taxbro-check-pfic | [ ] | US-pfic-summary.md |
-|    - Foreign Tax Credit| /taxbro-foreign-tax-credit | [ ] | US-ftc-summary.md |
-|    - Childcare | /taxbro-check-childcare | [ ] | US-childcare-summary.md |
-|    - Rental Income | /taxbro-rental-income | [ ] | US-rental-income.md |
-| 5. Worksheets | /taxbro-generate-worksheets| [ ] | US-worksheets.md |
-| 6. Validation | /taxbro-validate-return | [ ] | US-validation-report.md |
-| 7. Visualize | /taxbro-visualize | [ ] | US-knowledge-graph.html |
+| Step                   | Command                    | Status | Artifact                |
+|:-----------------------|:---------------------------|:------:|:------------------------|
+| 1. Initialize          | /taxbro-init               | [ ]    | session-notes.md        |
+| 2. Extract Data        | /taxbro-extract            | [ ]    | US-knowledge-graph.md   |
+| 3. Status Review       | /taxbro-checklist          | [ ]    | US-checklist.md         |
+| 4. Specific Analysis   |                            |        |                         |
+|    - W-2 Wages         | /taxbro-check-w2s          | [ ]    | US-w2-summary.md        |
+|    - FBAR/Foreign      | /taxbro-check-fbar         | [ ]    | US-fbar-summary.md      |
+|    - PFIC/Funds        | /taxbro-check-pfic         | [ ]    | US-pfic-summary.md      |
+|    - Foreign Tax Credit | /taxbro-foreign-tax-credit | [ ]    | US-ftc-summary.md       |
+|    - Childcare         | /taxbro-check-childcare    | [ ]    | US-childcare-summary.md |
+|    - Rental Income     | /taxbro-rental-income      | [ ]    | US-rental-income.md     |
+| 5. Worksheets          | /taxbro-generate-worksheets | [ ]   | US-worksheets.md        |
+| 6. Visualize           | /taxbro-visualize          | [ ]    | US-knowledge-graph.html |
+| 7. Validation          | /taxbro-validate-return    | [ ]    | US-validation-report.md |
 
 ---
 
@@ -71,8 +71,8 @@ Follow this priority list (from top to bottom):
    - If applicable AND the artifact (e.g., `US-w2-summary.md`) is missing: Next = that specific command.
    - If multiple are missing, pick the first one listed.
 5. **If all relevant analysis is done but no `US-worksheets.md`:** Next = `/taxbro-generate-worksheets`
-6. **If worksheets exist but no `US-validation-report.md`:** Next = `/taxbro-validate-return`
-7. **If all relevant analysis and worksheets exist but no `US-knowledge-graph.html`:** Next = `/taxbro-visualize`
+6. **If worksheets exist but no `US-knowledge-graph.html`:** Next = `/taxbro-visualize`
+7. **If visualization exists but no `US-validation-report.md`:** Next = `/taxbro-validate-return` (only when user has a draft return PDF)
 8. **If everything is complete:** Tell the user the return is ready for final review and suggest opening the visualization dashboard.
 
 ---

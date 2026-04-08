@@ -98,6 +98,7 @@ When pointed at a source folder, TaxBro expects:
 | `US-childcare-summary.md` | Childcare expenses, Form 2441 eligibility |
 | `US-rental-income.md` | Rental income INR→USD conversion, Schedule E summary |
 | `US-worksheets.md` | Pre-filled line-item worksheets for all applicable IRS forms |
+| `US-knowledge-graph.html` | Interactive HTML dashboard — tax waterfall, item impacts, global assets |
 | `US-validation-report.md` | Cross-check of completed return vs source documents |
 | `session-notes.md` | Freeform notes from analysis sessions |
 
@@ -119,6 +120,7 @@ When pointed at a source folder, TaxBro expects:
 | `/taxbro-check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
 | `/taxbro-rental-income` | Indian (or other foreign) rental income → Schedule E |
 | `/taxbro-generate-worksheets` | Generate pre-filled IRS form worksheets (FBAR, 1116, 8621, Schedule E, 2441) ready for preparer entry |
+| `/taxbro-visualize` | Interactive HTML dashboard — tax waterfall, per-item impact, threshold bars, 1040 worksheet |
 | `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents; flags discrepancies |
 
 ---
