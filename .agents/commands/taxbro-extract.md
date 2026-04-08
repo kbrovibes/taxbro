@@ -13,6 +13,10 @@ Usage:
 ⚠️ ABSOLUTE RULE: NEVER DELETE ANY FILE. NEVER run rm, rmdir, or any deletion.
    Only permitted operations: read files, write TAXBRO/US-knowledge-graph.md.
 
+⚠️ MANDATORY OUTPUT: The Computed Totals section MUST be written. If it is missing, ALL
+   downstream skills (/taxbro-worksheets, /taxbro-visualize, /taxbro-checklist) will produce
+   wrong results. The extraction is NOT complete until Computed Totals is written and verified.
+
 ---
 
 ## Step 1 — Setup
@@ -27,6 +31,42 @@ Usage:
 5. Determine IRS Pub 54 average annual exchange rate for relevant currencies for the tax year
    (e.g., INR/USD, CAD/USD). Use IRS Publication 54 Appendix. If unavailable, note "rate pending"
    and mark converted values as (~est).
+
+---
+
+## Step 1b — Two-Pass Triage (Speed Optimization)
+
+**Most documents do NOT need full multi-page parsing.** Use a two-pass approach:
+
+### Pass 1: Triage (read first 1-2 pages only)
+For EVERY document, read only the first 1-2 pages (or first 50 lines for text/CSV/XLS).
+Classify each into one of:
+
+| Classification | Action | Examples |
+|---|---|---|
+| **FULL-PARSE** | Read entire document in Pass 2 | W-2, 1099-B with many transactions, CAMS CAS, AIS, bank statements with 12 months |
+| **HEADER-ONLY** | First page has all needed data — done | 1099-INT, 1099-SA, 5498-SA, 1098, simple 1-page forms |
+| **SUMMARY-ONLY** | Skip to summary/totals page | 1099 consolidated (skip trade detail, read summary), Fidelity supplemental |
+| **REFERENCE** | Note existence but extract nothing | Informational docs, duplicates, irrelevant files |
+| **WORKING-FILE** | Pre-computed summary by user/agent | `2025-TAX-RETURN-SUMMARY.md`, working spreadsheets — use as verification source |
+
+**Key triage rules:**
+- **W-2 PDFs**: Always FULL-PARSE. They are 1 page each. Read EVERY box.
+- **1099-B trade detail (multi-page)**: SUMMARY-ONLY — skip individual trades, read category totals page.
+  Only go back to trades if you need quarterly attribution or wash sale detail.
+- **1099-INT / 1099-SA / 5498-SA / 1098**: HEADER-ONLY — all data is on page 1.
+- **Bank statements (12 monthly PDFs)**: Read first and last page of each to find peak and Dec 31 balances.
+  Do NOT read every transaction page.
+- **CAMS CAS**: SUMMARY-ONLY — skip transaction history, read portfolio valuation summary.
+- **AIS**: FULL-PARSE — need category totals from multiple sections.
+- **Childcare receipts**: HEADER-ONLY — provider name, EIN, annual total.
+- **Prior year return**: SUMMARY-ONLY — skip all forms, read only carryforward items.
+
+### Pass 2: Deep Extract
+Process only FULL-PARSE and SUMMARY-ONLY documents. For HEADER-ONLY documents,
+extraction is already complete from Pass 1.
+
+**This approach typically reads ~30% of total page volume vs. reading everything.**
 
 ---
 
@@ -45,12 +85,13 @@ separate knowledge graph sections. Launch them as parallel subagents:
 - Agent 4: 1098 (Mortgage) + Childcare Provider Statements + Advance Tax Challans + Prior Year Return
 
 Each agent receives: SOURCE_FOLDER path, file list for its category, exchange rate,
-filer context from CLAUDE.md. Each agent returns its extracted section as markdown text.
+filer context from CLAUDE.md, AND the triage classification from Step 1b.
+Each agent returns its extracted section as markdown text.
 
 **After all agents complete:**
 - Merge all sections into the knowledge graph schema
 - Run cross-document checks (Step 3) — these require data from multiple categories
-- Compute the "Computed Totals" section (Step 4b)
+- Compute the "Computed Totals" section (Step 4b) — **MANDATORY, NOT OPTIONAL**
 - Write the final `US-knowledge-graph.md`
 
 ### Sequential Extraction (Gemini)
@@ -70,14 +111,33 @@ For each W-2 PDF found:
 - Employer name and EIN
 - Box 1: Wages
 - Box 2: Federal income tax withheld
+- Box 3: Social Security wages
 - Box 4: Social Security tax withheld
+- Box 5: Medicare wages and tips
 - Box 6: Medicare tax withheld
 - Box 10: Dependent care FSA (DCFSA) — if non-zero
-- Box 12 codes: W (employer HSA), D (401k), DD (health insurance premiums), AA (Roth 401k)
+- Box 12 codes: W (employer HSA), D (401k), C (GTL), DD (health insurance premiums), AA (Roth 401k)
+- Box 14: Other (RSU, union dues, WAPFL, etc.) — note what's there
 - Box 16/17: State wages and state income tax withheld (per state)
-- Box 14: Other (RSU, union dues, etc.) — note what's there
 
 Do NOT extract employee SSN, address, or other PII.
+
+#### 🔴 MANDATORY W-2 CROSS-CHECKS (run for every W-2)
+
+These arithmetic checks catch PDF misreads. If ANY check fails, RE-READ the W-2 PDF
+carefully and correct the values before proceeding.
+
+| Check | Formula | Expected | Action if fails |
+|---|---|---|---|
+| SS tax rate | Box 4 ÷ Box 3 | = 6.20% (±0.01%) | Box 4 is wrong — recalculate or re-read |
+| Medicare tax rate | Box 6 ÷ Box 5 | ≥ 1.45% (may be higher with Additional Medicare) | Box 6 is wrong — re-read |
+| Wages vs Medicare | Box 5 ≥ Box 1 | Always true (Box 5 includes pre-tax 401k/FSA) | Box 1 and Box 5 may be swapped — verify |
+| SS wage cap | Box 3 ≤ $176,100 (2025) | Always true | Box 3 is wrong |
+| Fed Wh sanity | Box 2 ÷ Box 1 | 15%–40% typical for high earners | If outside range, verify — could indicate supplemental rate |
+| Box 1 vs Box 5 gap | Box 5 − Box 1 | ≈ Box 12D (401k) + Box 12 other pre-tax | If gap doesn't reconcile, a box is misread |
+
+**If Box 3 = $176,100 for employer (SS wage cap reached), then Box 4 MUST = $10,918.20.**
+This is the single most important check — it catches the most common extraction error.
 
 ### 1099 Consolidated (Brokerage — Fidelity, Schwab, Chase, etc.)
 
@@ -91,8 +151,24 @@ For each consolidated 1099:
 - Section 1256 gains (if any)
 - 1099-INT embedded: Box 1 (interest), Box 4 (federal withholding), Box 8 (tax-exempt interest)
 - 1099-B summary: total proceeds, total cost basis (covered), net gain/loss, wash sale disallowed amount
-  CRITICAL: RSU sales in Box B or E often show $0 basis. Scan for "Fidelity Supplemental" or "2025-TAX-RETURN-SUMMARY.md" in the source folder to find the actual adjusted cost basis (FMV at vest). Always flag $0 basis for preparer adjustment if supplemental basis isn't found.
-  NOTE: Do NOT list individual trades. Extract totals only. Note if Form 8949 required.
+
+  **🔴 MANDATORY: Extract SHORT-TERM and LONG-TERM gains SEPARATELY.**
+  The 1099-B summary always breaks down by:
+  - Box A: Short-term, basis reported to IRS
+  - Box B: Short-term, basis NOT reported (often RSU — flag for adjustment)
+  - Box D: Long-term, basis reported to IRS
+  - Box E: Long-term, basis NOT reported (often RSU — flag for adjustment)
+
+  Record each category's proceeds, basis, wash sale, and net G/L independently.
+  The ST/LT split is CRITICAL for tax computation — LTCG is taxed at 15-20% vs ordinary rates.
+  **Failure to split ST/LT can cause ~$20K+ tax computation errors on large portfolios.**
+
+  CRITICAL: RSU sales in Box B or E often show $0 basis. Scan for "Fidelity Supplemental" or
+  "2025-TAX-RETURN-SUMMARY.md" in the source folder to find the actual adjusted cost basis
+  (FMV at vest). Always flag $0 basis for preparer adjustment if supplemental basis isn't found.
+
+  NOTE: Do NOT list individual trades. Extract category totals only. Note if Form 8949 required.
+
 - **Quarterly capital gain attribution (for Form 2210):** From the 1099-B trade dates, determine
   which quarter(s) the bulk of capital gains were realized:
   - Q1: Jan–Mar | Q2: Apr–May | Q3: Jun–Aug | Q4: Sep–Dec
@@ -130,7 +206,7 @@ For each 1098:
 - Lender name
 - Box 1: Mortgage interest received
 - Box 2: Outstanding mortgage principal (as of January 1)
-- Box 3: Refund of overpaid interest (if any)
+- Box 3: Mortgage origination date
 - Box 10: Property taxes paid through escrow (if any)
 - Property address (optional — for Schedule E if rental)
 
@@ -157,17 +233,24 @@ For each account, extract ONLY:
 - If a Fixed Deposit (FD) exists: note the FD amount, rate, maturity date (do not extract full history)
 
 Do NOT list individual transactions. Do NOT copy statement tables.
-If 12 monthly statements exist (like Scotiabank), read all 12 to find the peak balance; report only the peak.
+If 12 monthly statements exist (like Scotiabank), read first and last page of each
+to find the peak balance; report only the peak.
 
 ### Indian Interest Certificates / Form 16A / TDS Certificates
 
 For each certificate:
 - Institution and account type
 - Account owner
-- Total interest credited (INR)
-- TDS deducted (INR) — this is the foreign tax paid for Form 1116
+- **Per-account breakdown** of interest and TDS (not just totals)
+  - List EACH account number with its interest and TDS separately
+  - Distinguish NRE (no TDS, no FTC) from NRO (TDS applies, FTC available)
+- Total interest credited (INR) and total TDS deducted (INR)
 - Certificate period
 - Whether account is NRE (no TDS in India) or NRO (TDS applies)
+
+**Also check for non-ICICI interest (SBI, HDFC, etc.):**
+If bank statements show interest credits but no certificate exists, extract from statement
+or from the working summary file (2025-TAX-RETURN-SUMMARY.md) and note the source.
 
 ### CAMS CAS / Mutual Fund Statements (PFIC)
 
@@ -231,7 +314,7 @@ After extracting all sections, run these checks. Add each issue to the Issues & 
 | Check | Rule | Action |
 |---|---|---|
 | Excess SS | Sum all W-2 Box 4 values. If total > $10,918.20 (6.2% × $176,100 for 2025), excess is a refundable credit | 🔴 Flag with amount |
-| Mortgage cap | Sum all 1098 Box 2 outstanding principal. If > $750,000, interest deduction is proportionally limited | ⚠️ Flag with total |
+| Mortgage cap | Sum all 1098 Box 2 outstanding principal. If > $750,000, interest deduction is proportionally limited. **Compute the ratio and deductible amount.** | 🔴 Flag with ratio and deductible amount |
 | Form 2441 earned income | If spouse has no W-2 income and no 1099-NEC / self-employment, childcare credit = $0 unless exception | 🔴 Flag |
 | DCFSA exclusion (IRC §129) | If spouse earned income = $0 and no student/disability exception, DCFSA exclusion = $0. The full W-2 Box 10 amount must be **added back to taxable income** (Box 1 wages are understated). This is separate from the Form 2441 credit test. | 🔴 Flag with amount to add back |
 | Form 2210 quarterly timing | Extract trade dates from 1099-B (or note which quarter bulk of capital gains occurred). If estimated payments were only made in Q4 but income was earned throughout, penalty applies. Note whether annualized income method (Schedule AI) could reduce penalty. | ⚠️ Flag with quarterly attribution |
@@ -245,6 +328,7 @@ After extracting all sections, run these checks. Add each issue to the Issues & 
 | AIS rental income | If AIS Section 7 shows rental income and no rental statement found → flag missing document | 🔴 Flag |
 | PFIC prior elections | If prior year return shows no QEF/MTM elections and PFIC funds are held → default excess distribution method applies | ⚠️ Note |
 | Missing documents | For every document type expected from CLAUDE.md that was not found, flag it | ⚠️ or 🔴 depending on importance |
+| Child Tax Credit | Check for qualifying children under 17. CTC = $2,000 per child (phases out at $400K MFJ AGI). | ℹ️ Note amount |
 
 Severity guide:
 - 🔴 = Must resolve before filing. Material impact or compliance requirement.
@@ -295,25 +379,38 @@ If a value could not be extracted (unreadable PDF, etc.), write `[unreadable]` a
 | Filing status | | |
 | Primary filer | | |
 | Spouse | | |
+| Dependents | | |
 | Residency | US resident full year | |
-| Tax year ref in docs | | |
 
 ---
 
 ## Income
 
 ### W-2 Wages
-| Employer | Box 1 Wages | Box 2 Fed Wh | Box 4 SS | Box 6 Med | Box 10 DCFSA | Box 12W HSA-emp | State Wh | Source |
-|---|---|---|---|---|---|---|---|---|
-| | | | | | | | | |
-| **Total** | | | | | | | | |
+| Employer | Box 1 Wages | Box 2 Fed Wh | Box 3 SS Wages | Box 4 SS Tax | Box 5 Med Wages | Box 6 Med Tax | Box 10 DCFSA | Box 12W HSA | Box 12D 401k | State | Source |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| | | | | | | | | | | | |
+| **Total** | | | | | | | | | | | |
+
+_W-2 Cross-Check Results: [PASS/FAIL per employer — show Box 4 ÷ Box 3 rate]_
 
 ### Brokerage Income (1099 Consolidated)
-| Institution | Ord Div | Qual Div | ST CG | LT CG | Interest | Fed Wh | 1099-B Net G/L | Wash Sale Disallowed | Source |
-|---|---|---|---|---|---|---|---|---|---|
-| | | | | | | | | | |
+| Institution | Ord Div | Qual Div | Interest | Fed Wh | Source |
+|---|---|---|---|---|---|
+| | | | | | |
 
-_Note: 1099-B detail → Form 8949 required: yes / no_
+#### Capital Gains Breakdown (🔴 MANDATORY — must split ST/LT)
+| Category | Proceeds | Cost Basis | Wash Sale | Net G/L |
+|---|---|---|---|---|
+| Short-term Box A (basis reported) | | | | |
+| Short-term Box B (basis NOT reported — RSU) | | | | |
+| Long-term Box D (basis reported) | | | | |
+| Long-term Box E (basis NOT reported — RSU) | | | | |
+| **Total Short-Term** | | | | |
+| **Total Long-Term** | | | | |
+| **Adjusted Net Capital Gains** | | | | |
+
+_Quarterly attribution: Q1 $__ | Q2 $__ | Q3 $__ | Q4 $___
 
 ### Interest Income (US)
 | Payer | Amount | Fed Wh | Source |
@@ -335,12 +432,13 @@ _Note: 1099-B detail → Form 8949 required: yes / no_
 ## Foreign Income
 
 ### Indian Bank Interest (Schedule B + Form 1116 Passive Basket)
-| Institution | Type | Owner | Interest (INR) | TDS Withheld (INR) | Interest (USD) ~ | TDS (USD) ~ | NRE? | Source |
-|---|---|---|---|---|---|---|---|---|
-| | | | | | | | | |
-| **Total** | | | | | | | | |
+| Institution | Acct | Type | Owner | Interest (INR) | TDS (INR) | Interest (USD) ~ | TDS (USD) ~ | NRE? | Source |
+|---|---|---|---|---|---|---|---|---|---|
+| | | | | | | | | | |
+| **Total** | | | | | | | | | |
 
 _NRE note: NRE interest = no Indian TDS, but fully taxable in US. No FTC credit available._
+_List ALL accounts with interest — including SBI, HDFC, and other banks (not just ICICI)._
 
 ### AIS Cross-Check
 | AIS Category | AIS Amount (INR) | Certificates Total (INR) | Gap | Status |
@@ -356,23 +454,38 @@ _NRE note: NRE interest = no Indian TDS, but fully taxable in US. No FTC credit 
 |---|---|---|
 | Property description | | CLAUDE.md |
 | Ownership % (Karthik / Vinaya) | | CLAUDE.md |
-| Gross rent received (INR) | ✗ | Not found |
+| Gross rent received (INR) | | |
 | Gross rent (USD) ~ | | |
-| TDS deducted by tenant (INR) | ✗ | Not found |
+| TDS deducted by tenant (INR) | | |
 | AIS Section 7 rental entry | | AIS file |
-| Depreciation basis established | | |
+| Depreciation | | |
+| PAL carryforward | | Prior return |
+| **Net rental income** | | |
 
 ---
 
 ## Deductions
 
 ### Mortgage Interest (Form 1098)
-| Lender | Box 1 Interest | Box 2 Principal (Jan 1) | Box 10 Prop Tax | Source |
-|---|---|---|---|---|
-| | | | | |
-| **Total** | | | | |
+| Lender | Box 1 Interest | Box 2 Principal (Jan 1) | Box 3 Origination | Box 10 Prop Tax | Source |
+|---|---|---|---|---|---|
+| | | | | | |
+| **Total** | | | | | |
 
-_Combined outstanding principal: $? — limit check: {'✓ under $750k' or '⚠️ exceeds $750k — deduction limited'}_
+_Combined outstanding principal: $?_
+_Deductible fraction: $750,000 / $? = ?%_
+_**Deductible mortgage interest: ~$?**_
+_Non-deductible interest: ~$?_
+
+### Itemized Deductions (Schedule A)
+| Item | Amount | Notes |
+|---|---|---|
+| Deductible mortgage interest | | From cap calculation above |
+| SALT (property tax, capped) | $10,000 | Actual $? but MFJ cap = $10,000 |
+| Charitable | | If applicable |
+| **Total Itemized** | | |
+| Standard deduction (MFJ) | $30,000 | 2025 |
+| **Better of** | | Itemize / Standard |
 
 ### Childcare (Form 2441)
 | Provider | EIN | Amount Paid | Period | Children | Source |
@@ -388,7 +501,7 @@ _Combined outstanding principal: $? — limit check: {'✓ under $750k' or '⚠�
 | Vinaya earned income | $0 — no W-2 |
 | Disability/student exception | ✗ / ✓ (check CLAUDE.md) |
 | Form 2441 credit | **$0** — earned income test fails |
-| **DCFSA exclusion valid?** | **🔴 NO if spouse $0 earned income** — IRC §129(b)(2): exclusion limited to lesser of either spouse's earned income. If $0, full Box 10 amount added back to taxable income |
+| **DCFSA exclusion valid?** | **🔴 NO if spouse $0 earned income** — IRC §129(b)(2) |
 | DCFSA add-back to income | $? — amount to add to Line 1 wages |
 
 ---
@@ -398,7 +511,6 @@ _Combined outstanding principal: $? — limit check: {'✓ under $750k' or '⚠�
 ### Account Summary
 | Institution | Type | Owner | Acct (last 4) | Max Bal (local) | Max Bal (USD) ~ | Dec 31 Bal (local) | Dec 31 Bal (USD) ~ | Source |
 |---|---|---|---|---|---|---|---|---|
-| | | | | | | | | |
 | | | | | | | | | |
 
 ### Threshold Analysis
@@ -432,18 +544,12 @@ _Combined outstanding principal: $? — limit check: {'✓ under $750k' or '⚠�
 ### Foreign Tax Credit (Form 1116)
 | Basket | Income Type | Gross Foreign Income (USD) | Foreign Tax Paid (USD) | Source |
 |---|---|---|---|---|
-| Passive | Indian bank interest (NRO) | | | Interest certs |
-| Passive | Indian FD interest (NRO) | | | Interest certs |
-| General | India advance tax payments | | | Challans |
+| Passive | Indian bank interest (NRO only) | | | Interest certs |
+| Passive | Indian FD interest (NRO only) | | | Interest certs |
 | General | Indian rental TDS (if applicable) | | | Challan/AIS |
 
-_Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carries forward 10 years._
-
-### India Advance Tax Payments
-| Date | Amount (INR) | Amount (USD) ~ | Assessment Year | Source |
-|---|---|---|---|---|
-| | | | | |
-| **Total** | | | | |
+_Note: NRE interest has NO FTC available — zero TDS in India._
+_FTC cannot exceed (foreign income / total income) × US tax. Excess carries forward 10 years._
 
 ---
 
@@ -452,7 +558,8 @@ _Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carri
 |---|---|---|
 | W-2 withholding (total across all W-2s) | | |
 | 1099 withholding (total across all 1099s) | | |
-| **Total federal withholding** | | |
+| Estimated tax payments (1040-ES) | | |
+| **Total federal payments** | | |
 
 ---
 
@@ -465,31 +572,36 @@ _Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carri
 | AMT credit carryforward | | Prior return |
 | PFIC elections (QEF/MTM) | None | Prior return |
 | FBAR filed for prior year | | Prior return |
+| Prior year total tax (for safe harbor) | | Prior return |
 
 ---
 
 ## Source Document Registry
 <!-- Every document found: was it read and what was extracted? -->
 
-| File | Category | Extracted | Notes |
-|---|---|---|---|
-| | | ✓ / ✗ / [unreadable] | |
+| File | Category | Triage | Extracted | Notes |
+|---|---|---|---|---|
+| | | FULL-PARSE / HEADER-ONLY / SUMMARY-ONLY / REFERENCE | ✓ / ✗ / [unreadable] | |
 
 ---
 
 ## Computed Totals (Single Source of Truth)
-<!-- CRITICAL: All downstream skills (/taxbro-generate-worksheets, /taxbro-visualize, /taxbro-checklist)
-     MUST read these totals instead of recomputing from raw sections. This prevents agent drift. -->
+<!-- 🔴🔴🔴 THIS SECTION IS MANDATORY. DO NOT SKIP IT. 🔴🔴🔴
+     All downstream skills (/taxbro-worksheets, /taxbro-visualize, /taxbro-checklist)
+     MUST read these totals instead of recomputing from raw sections. This prevents agent drift.
+     If this section is missing, the knowledge graph extraction is INCOMPLETE. -->
 
 ### Income Aggregation
 | Line | Description | Amount | Formula / Source |
 |---|---|---|---|
 | Wages (1040 Line 1a) | W-2 Box 1 total | $ | Sum of W-2 table |
-| Taxable Interest (1040 Line 2b) | US + foreign interest | $ | US 1099-INT total + NRE interest (USD) + NRO interest (USD) |
-| Ordinary Dividends (1040 Line 3b) | | $ | 1099 consolidated Ord Div total |
-| Qualified Dividends (1040 Line 3a) | | $ | 1099 consolidated Qual Div total |
-| Capital Gain (1040 Line 7) | Net, after basis adjustments | $ | **Use adjusted 1099-B gain, NOT face value.** If RSU basis adjusted: state adjusted amount explicitly |
-| Rental Income (Sch 1 Line 5) | Net after depreciation + PAL | $ | Gross rent (USD) − depreciation − expenses + prior PAL applied |
+| Taxable Interest (1040 Line 2b) | US + foreign interest | $ | US 1099-INT total + all foreign interest (USD) |
+| Ordinary Dividends (1040 Line 3b) | Non-qualified | $ | Total ordinary − qualified |
+| Qualified Dividends (1040 Line 3a) | Preferential rate | $ | From 1099 |
+| **Short-Term Capital Gain** | Taxed as ordinary income | **$** | Box A + Box B (adjusted) |
+| **Long-Term Capital Gain** | Taxed at preferential rates | **$** | Box D + Box E (adjusted) |
+| Net Capital Gain (1040 Line 7) | ST + LT combined | $ | Sum of above two lines |
+| Rental Income (Sch 1 Line 5) | Net after depreciation + PAL | $ | From rental section |
 | **Total Income (1040 Line 9)** | | **$** | Sum of all above |
 
 ### Key Adjustments
@@ -501,21 +613,30 @@ _Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carri
 ### Tax Computation Reference
 | Item | Amount | Notes |
 |---|---|---|
-| Standard Deduction (MFJ 2025) | $30,000 | Or itemized if larger |
 | Itemized — Mortgage interest (deductible portion) | $ | Total interest × ($750K ÷ outstanding principal); show ratio |
 | Itemized — SALT (capped) | $10,000 | Property tax $X but capped at $10K |
 | Itemized — Charitable | $ | If applicable |
 | **Estimated Itemized Total** | **$** | |
+| Standard Deduction (MFJ 2025) | $30,000 | Or itemized if larger |
 | **Better of Standard/Itemized** | **$** | |
 | **Taxable Income (Line 15)** | **$** | AGI − deduction |
+
+_Taxable income breakdown (CRITICAL for correct tax computation):_
+- _Ordinary taxable: $__ (wages + ST gains + interest + non-QD divs + rental − deductions)_
+- _LTCG + QD at preferential rates: $___
 
 ### Tax & Credits Estimate
 | Item | Amount | Notes |
 |---|---|---|
-| Regular tax (from brackets) | $ | Use 2025 MFJ brackets: 10/12/22/24/32/35/37% |
+| Ordinary income tax (from brackets) | $ | Use 2025 MFJ brackets: 10/12/22/24/32/35/37%. Apply to ORDINARY taxable income ONLY. |
+| **LTCG + QD tax** | $ | Use preferential rates: 0/15/20% based on income stacking. At high incomes, typically 20%. |
 | Additional Medicare Tax (0.9%) | $ | 0.9% × (wages − $250K MFJ threshold) |
 | Net Investment Income Tax (3.8%) | $ | 3.8% × min(NII, MAGI − $250K); NII = cap gains + dividends + interest + rental |
-| **Estimated Total Tax** | **$** | Regular + AMT + Additional Medicare + NIIT |
+| **Estimated Total Tax (before credits)** | **$** | Sum of all above |
+| Excess SS credit (Schedule 3 Line 11) | −$ | Refundable |
+| Foreign Tax Credit (Form 1116) | −$ | |
+| Child Tax Credit | −$ | $2,000 per qualifying child under 17 |
+| **Estimated Total Tax (after credits)** | **$** | |
 
 ### Payments & Credits
 | Item | Amount | Source |
@@ -523,46 +644,64 @@ _Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carri
 | W-2 withholding (total) | $ | |
 | 1099 withholding (total) | $ | |
 | Estimated tax payments (1040-ES) | $ | |
-| Excess SS credit (Schedule 3) | $ | |
-| Foreign tax credit (Form 1116) | $ | |
-| Child tax credit | $ | $2,000 per qualifying child under 17 |
-| **Total Payments + Credits** | **$** | |
+| **Total Payments** | **$** | |
 
 ### Bottom Line
 | Item | Amount |
 |---|---|
 | Estimated Total Tax | $ |
-| Total Payments + Credits | $ |
+| Total Payments | $ |
 | **Estimated Refund / (Owe)** | **$** |
 | Form 2210 penalty estimate | $ |
 | **Net Refund / (Owe) after penalty** | **$** |
 
 _⚠️ These are ESTIMATES using simplified bracket math. Actual return will differ due to:_
-_qualified dividend/LTCG preferential rates, AMT calculation, Form 1116 limitation, Schedule D worksheet._
+_qualified dividend/LTCG preferential rates (Schedule D worksheet), AMT calculation, Form 1116 limitation._
 _Purpose: provide a directional "are we in refund or owe territory" answer and catch gross errors._
 ```
 
 ---
 
-## Step 5 — Update Supporting Files
+## Step 5 — Self-Validation (MANDATORY)
+
+Before writing the final knowledge graph, run these sanity checks on your own output.
+**If any check fails, fix the data before writing.**
+
+| Check | Formula | Expected |
+|---|---|---|
+| Box 4 total × rate | Sum of all Box 4 ÷ (N_employers × $176,100) | ≈ 6.2% per employer |
+| Federal withholding total | Sum of all W-2 Box 2 + 1099 Box 4 | Must equal Federal Tax Payments total |
+| Capital gains | ST + LT | Must equal Net Capital Gain |
+| Taxable income | AGI − deduction | Must equal stated taxable income |
+| Total tax > total payments | Implies "owe" | Bottom line must say "owe" |
+| Total tax < total payments | Implies "refund" | Bottom line must say "refund" |
+| Computed Totals present | Section exists in output | **FAIL if missing** |
+
+---
+
+## Step 6 — Update Supporting Files
 
 After writing the knowledge graph:
 
 1. **Append to `{SOURCE_FOLDER}/TAXBRO/session-notes.md`** (do NOT overwrite):
    ```
    ## Extraction — {DATE}
-   - Documents read: N of M
+   - Documents read: N of M (FULL-PARSE: X, HEADER-ONLY: Y, SUMMARY-ONLY: Z, REFERENCE: W)
    - Sections complete: [list]
    - Issues found: N (🔴 X critical, ⚠️ Y attention)
    - IRS Pub 54 rate used: {rate}
+   - W-2 cross-checks: PASS/FAIL per employer
+   - Self-validation: PASS/FAIL
    ```
    Structural metadata only — no financial figures in this log.
 
 2. **Tell the user**:
    "Knowledge graph built. N documents read. X critical issues, Y items needing attention.
-   Run /taxbro-checklist to review the full picture, or ask me to walk through any specific topic."
+   Bottom line: estimated [refund $X / owe $X].
+   Run /taxbro-worksheets to generate preparer-ready forms."
 
-3. **Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md`** recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+3. **Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md`** recording: agent-id, skill-name,
+   status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
 
 ---
 
@@ -570,7 +709,7 @@ After writing the knowledge graph:
 
 - **Extract facts, not content.** Never copy paragraphs, transaction lists, or statement tables into the graph.
 - **Link, don't embed.** Every value gets a `source:` citation (relative filename). The user can open the file for detail.
-- **Totals only for 1099-B.** Individual trade rows belong in Form 8949; the graph only needs net gain/loss and wash sale totals.
+- **Totals only for 1099-B.** Individual trade rows belong in Form 8949; the graph only needs net gain/loss by category (ST/LT) and wash sale totals.
 - **Balances only for bank statements.** Max balance and year-end balance. Not transactions.
 - **Holdings snapshot for CAMS CAS.** Year-end units/NAV/value and any distributions. Not full transaction history.
 - **AIS category totals.** Not individual entries.
@@ -578,3 +717,6 @@ After writing the knowledge graph:
 - **No deletions.** Never run rm, rmdir, or any file deletion command. Only write to TAXBRO/.
 - **Skip .snapshots/.** Never read from or write to TAXBRO/.snapshots/.
 - **Mark unreadable files.** If a PDF is encrypted, corrupted, or unparseable, note it in the Source Registry as [unreadable] and flag it in Issues.
+- **ST/LT split is NEVER optional.** Capital gains must always be broken into short-term and long-term. This affects tax computation by thousands of dollars.
+- **W-2 cross-checks are NEVER optional.** Every W-2 must pass arithmetic validation before its numbers enter the knowledge graph.
+- **Computed Totals is NEVER optional.** The extraction is incomplete without it.
