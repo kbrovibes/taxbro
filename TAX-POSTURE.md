@@ -594,6 +594,70 @@ Net losses up to $3,000/year offset ordinary income.
 Watch the wash sale rule: no buying "substantially identical" securities within
 30 days before or after the sale. Applies across all accounts (brokerage, IRA, HSA).
 
+### Credits that DON'T apply at high income
+
+Several credits that sound relevant are **fully phased out** at this income level.
+This is important to understand so you don't waste time trying to claim them.
+
+#### Child Tax Credit (CTC) — $2,000 per child
+
+The CTC is a **credit** (reduces tax dollar-for-dollar), not a deduction (which
+only reduces taxable income). At 37% marginal rate, a $2,000 credit is worth
+$2,000; a $2,000 deduction would only be worth ~$740.
+
+**Phase-out for MFJ:** Begins at $400,000 MAGI. Reduces by $50 for every $1,000
+of MAGI above $400,000.
+
+```
+AGI $400,000 --> full $2,000 credit
+AGI $420,000 --> $1,000 credit ($20K over x $50/$1K = $1,000 reduction)
+AGI $440,000 --> $0 credit (fully phased out)
+AGI $500,000 --> $0
+AGI $600,000 --> $0
+```
+
+**At ~$500K+ AGI (typical for this posture), CTC = $0.** The phase-out completely
+eliminates it. There is nothing to claim and nothing to amend for.
+
+The **$500 Credit for Other Dependents** (ODC) — available for dependents without
+SSN or who don't qualify for CTC — uses the same phase-out. At $500K AGI, ODC = $0.
+
+**When CTC could apply:**
+- A year where AGI dips below $440K (unlikely with RSU income, but possible if
+  fewer vests or large capital losses offset income)
+- If Congress changes the phase-out thresholds (TCJA provisions expire after 2025 —
+  the pre-TCJA phase-out started at $110K MFJ with a $1,000 credit, so this could
+  go either direction)
+
+**SSN requirement:** Even if AGI were low enough, the child needs a valid SSN
+(not ITIN) to claim the $2,000 CTC. The $500 ODC accepts ITIN. Get the SSN
+regardless — it's needed for other benefits (DCFSA, childcare credit, future
+tax law changes).
+
+#### Child and Dependent Care Credit (Form 2441)
+
+Maximum credit: 20-35% of up to $3,000 (one child) or $6,000 (two+ children)
+in qualifying childcare expenses. At AGI above $43,000, the rate is 20%.
+
+**This credit has NO high-income phase-out** — unlike CTC, it's available at any
+income level. Maximum value: 20% x $3,000 = $600 (one child) or $1,200 (two).
+
+However, the credit is reduced dollar-for-dollar by any Dependent Care FSA
+(DCFSA) benefits received. If you use the full $5,000 DCFSA, the credit is
+typically $0 (the $5,000 DCFSA exclusion exceeds the $3,000/$6,000 expense cap).
+
+**DCFSA note:** The $5,000 DCFSA exclusion requires the lower-earning spouse to
+have earned income. If the spouse has $0 earned income (and no student/disability
+exception), the DCFSA exclusion is $0 and the amount must be added back to income.
+
+#### Earned Income Tax Credit (EITC)
+
+Fully phased out above ~$63K AGI (MFJ, 2024). Not applicable at this income level.
+
+#### American Opportunity / Lifetime Learning Credit
+
+Education credits phase out above ~$180K MAGI (MFJ). Not applicable.
+
 ### Charitable giving
 
 At high income, consider:
@@ -690,7 +754,11 @@ Every form that applies to this tax posture, every year:
 | PFIC de minimis (per fund) | $25,000 | $25,000 |
 | PFIC de minimis (aggregate) | $25,000 | $25,000 |
 | WA capital gains threshold | $270,000 | $280,950 |
-| Child tax credit | $2,000 | $2,000 |
+| Child tax credit (per child) | $2,000 | $2,000 |
+| CTC phase-out start (MFJ) | $400,000 | $400,000 |
+| CTC fully eliminated (MFJ) | $440,000 | $440,000 |
+| Child care credit max (1 child) | $600 | $600 |
+| DCFSA limit | $5,000 | $5,000 |
 | LTCG rate (high bracket) | 20% | 20% |
 | Additional Medicare (>$200K) | 0.9% | 0.9% |
 

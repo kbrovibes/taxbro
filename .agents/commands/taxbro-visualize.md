@@ -93,7 +93,7 @@ TAX_DATA = {
       general: { income, taxPaid, carryforward }
     },
     excessSS: { total, max, excess },
-    childTaxCredit: { amount, children }
+    childTaxCredit: { amount, children, phaseOutStart, fullyEliminated, agiOverThreshold, reason }
   },
 
   // Payments
@@ -211,8 +211,17 @@ Render as expandable cards, each with:
 12. **NIIT** — Show: NII amount, MAGI over $250K. Impact: 3.8% on lesser of NII or MAGI excess.
 13. **Form 2210 Penalty** — Show: quarterly analysis, when payments were made. Impact: estimated penalty. Explain safe harbor.
 14. **Qualified Dividend / LTCG Rate Benefit** — Show: amount taxed at preferential rates instead of ordinary. Impact: tax savings vs if all ordinary.
+15. **Child Tax Credit (Phase-Out)** — Show: AGI, phase-out threshold ($400K MFJ), fully-eliminated threshold ($440K), computed credit amount (likely $0). Impact: at AGI above $440K, credit is fully phased out. Explain the math: reduces by $50 per $1,000 over $400K. Same applies to $500 ODC. **This is a mandatory callout** — always render even when the credit is $0, because it explains WHY it's $0.
 
 Each card should show the **marginal tax rate context** — e.g., "At your marginal rate of 35%, this $X deduction saves $Y in tax."
+
+**MANDATORY RULE for "not applicable" items:** When a credit or deduction is phased out
+due to income level, DO NOT silently omit it. Always render a card explaining:
+1. What the credit/deduction is
+2. What the phase-out threshold is
+3. Where AGI falls relative to the threshold
+4. The result (e.g., "$0 credit — fully phased out")
+This is essential context — the filer needs to understand what they're NOT getting and why.
 
 ---
 
