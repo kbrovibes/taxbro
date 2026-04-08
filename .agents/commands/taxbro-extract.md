@@ -62,6 +62,7 @@ For each consolidated 1099:
 - Section 1256 gains (if any)
 - 1099-INT embedded: Box 1 (interest), Box 4 (federal withholding), Box 8 (tax-exempt interest)
 - 1099-B summary: total proceeds, total cost basis (covered), net gain/loss, wash sale disallowed amount
+  CRITICAL: RSU sales in Box B or E often show $0 basis. Scan for "Fidelity Supplemental" or "2025-TAX-RETURN-SUMMARY.md" in the source folder to find the actual adjusted cost basis (FMV at vest). Always flag $0 basis for preparer adjustment if supplemental basis isn't found.
   NOTE: Do NOT list individual trades. Extract totals only. Note if Form 8949 required.
 - Total federal withholding across the form
 
