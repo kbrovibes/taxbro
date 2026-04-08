@@ -16,52 +16,40 @@ Generic enough to work for any filer; personalized through the source folder's o
 ```
 /taxbro-init /path/to/your/tax/documents/
 ```
-This reads the source folder's `CLAUDE.md` (if present), discovers documents, and writes a session reference to `.current-session` (gitignored).
 
-### 2. Run any skill
+### 2. Extract and analyze everything in one pass
 ```
-/taxbro-next
-/taxbro-checklist
-/taxbro-check-w2s
-/taxbro-check-fbar
-/taxbro-check-pfic
-/taxbro-foreign-tax-credit
-/taxbro-check-childcare
-/taxbro-rental-income
+/taxbro-extract
 ```
-Each skill reads `.current-session` to know where your documents are.
-You can also pass the path directly: `/taxbro-check-fbar /path/to/taxes/`
+This reads every document, builds the knowledge graph with full analysis and computed totals.
 
-### 0. Get an overview
+### 3. Visualize
 ```
-/taxbro
-/taxbro-next --show
+/taxbro-visualize
 ```
-Shows all commands, current session status, and output file reference.
+Opens an interactive HTML dashboard in your browser.
 
-### 3. All outputs go to the source folder
-Every skill writes its output to `{SOURCE_FOLDER}/TAXBRO/` — never into this directory.
+### 4. Deep dives and filing
+```
+/taxbro-compliance          — FBAR/PFIC/FTC deep dive (if flagged)
+/taxbro-worksheets          — preparer-ready IRS form line items
+/taxbro-validate-return     — cross-check a draft return PDF
+```
+
+All outputs go to `{SOURCE_FOLDER}/TAXBRO/` — never into this directory.
 
 ---
 
-## ⛔ ABSOLUTE FILE SAFETY RULES — NON-NEGOTIABLE, OVERRIDE EVERYTHING
+## ABSOLUTE FILE SAFETY RULES — NON-NEGOTIABLE
 
 ### NEVER DELETE ANY FILE. EVER.
 
 **TaxBro must NEVER delete, remove, or destroy any file under any circumstance.**
 
-This means NO:
-- `rm` / `rm -rf`
-- `rmdir`
-- `os.remove()` / `shutil.rmtree()` / `unlink()`
-- Any shell or Python equivalent that destroys file content
-
 The ONLY permitted file operations are:
 - **READ** — read any source file
 - **WRITE** — create or overwrite a specific TAXBRO output file
 - **MOVE (mv)** — only when archiving to `.snapshots/` during `--reset`
-
-If you want a clean slate, use `/taxbro-init --reset` which moves outputs to a timestamped snapshot — nothing is ever destroyed.
 
 **If you find yourself about to delete a file: STOP. Archive it instead.**
 
@@ -73,9 +61,9 @@ If you want a clean slate, use `/taxbro-init --reset` which moves outputs to a t
 
 1. **Never write personal data into `~/claude/taxbro/`** — no names, SSNs, account numbers, balances, income figures, addresses, or any content extracted from tax documents
 2. **`.current-session` contains only a file path** — acceptable to write here; gitignored
-3. **All analysis outputs (summaries, checklists, extracted tables)** go to `{SOURCE_FOLDER}/TAXBRO/` only
-4. **Never commit TAXBRO output folders** — they may contain PII; the source folder is the user's responsibility
-5. **Memory/learnings that are stored** must contain only structural/methodological insights (e.g., "NRE interest is US-taxable"), never specific dollar amounts or account details
+3. **All analysis outputs** go to `{SOURCE_FOLDER}/TAXBRO/` only
+4. **Never commit TAXBRO output folders** — they may contain PII
+5. **Memory/learnings that are stored** must contain only structural/methodological insights, never dollar amounts or account details
 
 ---
 
@@ -86,21 +74,15 @@ When pointed at a source folder, TaxBro expects:
 - Tax documents (PDFs, statements, etc.) — any naming convention works
 - TaxBro will create a `TAXBRO/` subdirectory for outputs
 
-### What TaxBro writes to `{SOURCE_FOLDER}/TAXBRO/`:
-| File | Contents |
-|------|----------|
-| `US-knowledge-graph.md` | Extracted facts from all documents: income, accounts, taxes, flags, cross-checks |
-| `US-checklist.md` | Status of all key tax issues (reads knowledge graph when available) |
-| `US-fbar-summary.md` | Foreign account balances table for FinCEN 114 |
-| `US-pfic-summary.md` | PFIC fund list, distribution check, Form 8621 determination |
-| `US-ftc-summary.md` | Foreign taxes paid, Form 1116 basket breakdown |
-| `US-w2-summary.md` | W-2 analysis, excess SS check, DCFSA amounts |
-| `US-childcare-summary.md` | Childcare expenses, Form 2441 eligibility |
-| `US-rental-income.md` | Rental income INR→USD conversion, Schedule E summary |
-| `US-worksheets.md` | Pre-filled line-item worksheets for all applicable IRS forms |
-| `US-knowledge-graph.html` | Interactive HTML dashboard — tax waterfall, item impacts, global assets |
-| `US-validation-report.md` | Cross-check of completed return vs source documents |
-| `session-notes.md` | Freeform notes from analysis sessions |
+### Output files (all in `{SOURCE_FOLDER}/TAXBRO/`):
+| File | Produced by |
+|------|-------------|
+| `US-knowledge-graph.md` | `/taxbro-extract` — all facts, cross-checks, flags, computed totals |
+| `US-knowledge-graph.html` | `/taxbro-visualize` — interactive dashboard |
+| `US-compliance-summary.md` | `/taxbro-compliance` — FBAR, PFIC, FTC deep dive |
+| `US-worksheets.md` | `/taxbro-worksheets` — preparer-ready IRS form line items |
+| `US-validation-report.md` | `/taxbro-validate-return` — cross-check of return vs sources |
+| `session-notes.md` | `/taxbro-init` — document inventory and session log |
 
 ---
 
@@ -108,40 +90,26 @@ When pointed at a source folder, TaxBro expects:
 
 | Command | Purpose |
 |---------|---------|
-| `/taxbro` | Show all commands, session status, and output file reference |
-| `/taxbro-init [path]` | Load source folder, discover documents; `--reset` to snapshot outputs and start fresh |
-| `/taxbro-next` | **Identify and execute the next eligible command (orchestrator)** |
-| `/taxbro-extract` | Read all documents → build `US-knowledge-graph.md` (run after init, before checklist) |
-| `/taxbro-checklist` | Full status review — reads knowledge graph + flags items for attention |
-| `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |
-| `/taxbro-check-fbar` | Foreign accounts: max/year-end balances, FBAR/8938 thresholds |
-| `/taxbro-check-pfic` | PFIC analysis: fund list, distributions, Form 8621 determination |
-| `/taxbro-foreign-tax-credit` | Consolidate foreign taxes paid → Form 1116 |
-| `/taxbro-check-childcare` | Childcare expenses + Form 2441 earned-income eligibility |
-| `/taxbro-rental-income` | Indian (or other foreign) rental income → Schedule E |
-| `/taxbro-generate-worksheets` | Generate pre-filled IRS form worksheets (FBAR, 1116, 8621, Schedule E, 2441) ready for preparer entry |
-| `/taxbro-visualize` | Interactive HTML dashboard — tax waterfall, per-item impact, threshold bars, 1040 worksheet |
-| `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against all source documents; flags discrepancies |
+| `/taxbro-init [path]` | Load source folder, discover documents; `--reset` to snapshot and start fresh |
+| `/taxbro-extract` | **Read all documents → build knowledge graph with full analysis** (run this first) |
+| `/taxbro-visualize` | Interactive HTML dashboard — tax waterfall, per-item impact, threshold bars |
+| `/taxbro-compliance` | Deep dive: FBAR + Form 8938 + PFIC/Form 8621 + FTC/Form 1116 |
+| `/taxbro-worksheets` | Preparer-ready IRS form line items (reads computed totals from knowledge graph) |
+| `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against source documents |
+
+Archived skills (in `.agents/commands/archive/`) are available for reference but no longer part of the standard workflow.
 
 ---
 
 ## Extending TaxBro
 
-To add a new skill, create `.claude/commands/your-skill.md`.
-
-Skill template:
-```markdown
-# /your-skill
-Read .current-session to get SOURCE_FOLDER (or use $ARGUMENTS if provided).
-[Your analysis instructions here]
-Write output to {SOURCE_FOLDER}/TAXBRO/your-output.md.
-Never write PII or document contents to any file inside ~/claude/taxbro/.
-```
+To add a new skill, create `.agents/commands/your-skill.md` (Claude reads via `.claude/commands/` symlink).
 
 ---
 
 ## Notes
 - Built for US federal tax returns (Form 1040 + international schedules)
-- Handles: FBAR, Form 8938, Form 8621 (PFIC), Form 1116, Schedule E, Form 2441
+- Handles: FBAR, Form 8938, Form 8621 (PFIC), Form 1116, Schedule E, Form 2441, Form 2210
 - IRS exchange rates: use IRS Publication 54 average annual rates for recurring foreign income
 - Tax year is inferred from the source folder's CLAUDE.md; default assumption is prior calendar year
+- DCFSA exclusion (IRC §129): if spouse has $0 earned income, DCFSA amount added back to income

@@ -1,6 +1,6 @@
 # Spec 003: TaxBro Simplification — Strip to What Matters
 
-**Status:** Draft
+**Status:** Implemented
 **Date:** 2026-04-07
 **Author:** Claude Opus 4.6 + Karthik
 

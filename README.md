@@ -2,112 +2,114 @@
 
 A Claude Code assistant for analyzing and preparing US federal tax returns.
 
-Point it at a folder of tax documents — W-2s, 1099s, foreign bank statements, mutual fund CAS reports, childcare receipts — and TaxBro reads everything once, builds a structured knowledge graph, and lets you interrogate, validate, and produce worksheets for your preparer without ever touching the raw documents again.
+Point it at a folder of tax documents — W-2s, 1099s, foreign bank statements, mutual fund CAS reports, childcare receipts — and TaxBro reads everything in one pass, builds a structured knowledge graph with computed totals, and produces an interactive dashboard. Use the compliance and worksheet skills when you need deep dives or preparer-ready output.
+
+---
+
+## Quick start
+
+```
+1. Clone + open Claude Code
+
+   git clone https://github.com/kbrovibes/taxbro ~/claude/taxbro
+   cd ~/claude/taxbro && claude
+
+2. Point at your tax folder
+
+   /taxbro-init ~/taxes/2025/
+
+3. Extract and analyze everything
+
+   /taxbro-extract
+
+4. See the results
+
+   /taxbro-visualize              --> open the HTML dashboard
+
+5. When you need more
+
+   /taxbro-compliance             --> FBAR/PFIC/FTC deep dive
+   /taxbro-worksheets             --> preparer-ready form line items
+
+6. When your CPA sends a draft
+
+   /taxbro-validate-return ~/taxes/2025/draft-return.pdf
+```
 
 ---
 
 ## How it works
 
-TaxBro is a set of **Claude Code slash commands** (skills) organized around a two-phase architecture:
+TaxBro reads every source document once and builds a structured knowledge graph. The graph includes extracted facts, cross-document checks, and computed totals (income, AGI, estimated tax, refund/owe). All downstream skills read from the graph — no raw documents re-read.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        YOUR TAX FOLDER                          │
-│                                                                 │
-│  W-2s   1099s   1098s   Bank Statements   CAMS CAS   AIS/TIS    │
-│  Childcare Receipts   Interest Certs   Advance Tax Challans     │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                    /taxbro-init (discover)
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PHASE 1 — EXTRACTION                /taxbro-extract            │
-│                                                                 │
-│  Reads every source document exactly once.                      │
-│  Extracts only what matters — facts, not content.               │
-│                                                                 │
-│  Per W-2:   wages, withholding, SS tax, Box 12 codes            │
-│  Per bank:  max balance + Dec 31 balance (not transactions)     │
-│  Per CAMS:  year-end NAV snapshot + any redemptions             │
-│  Per AIS:   income category totals (not individual entries)     │
-│  Per 1099:  totals only (not individual trades)                 │
-│  ...and 13 cross-document checks (excess SS, FBAR threshold,    │
-│     PFIC de minimis, AIS reconciliation, Form 2441 test, etc.)  │
-│                                                                 │
-│                              ▼                                  │
-│             ┌────────────────────────────────┐                  │
-│             │    US-knowledge-graph.md       │                  │
-│             │                                │                  │
-│             │  Issues & Flags   🔴 ⚠️ ℹ️      │                  │
-│             │  Identity                      │                  │
-│             │  Income (W-2 / 1099 / HSA)     │                  │
-│             │  Foreign Income                │                  │
-│             │  Deductions                    │                  │
-│             │  Foreign Accounts (FBAR)       │                  │
-│             │  PFIC / Mutual Funds           │                  │
-│             │  Credits (Form 1116)           │                  │
-│             │  Payments                      │                  │
-│             │  Source Document Registry      │                  │
-│             └────────────────────────────────┘                  │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-                               │  (read once, reuse many times)
-                               │
-┌─────────────────────────────────────────────────────────────────┐
-│  PHASE 2 — ANALYSIS                                             │
-│                                                                 │
-│  /taxbro-next          → status-aware orchestrator (start here) │
-│  /taxbro-checklist     → topic-by-topic review + priority flags │
-│  /taxbro-check-w2s     → excess SS calc, DCFSA, withholding     │
-│  /taxbro-check-fbar    → FBAR/8938 thresholds + account table   │
-│  /taxbro-check-pfic    → Form 8621 per fund, de minimis check   │
-│  /taxbro-foreign-tax-credit  → Form 1116 basket breakdown       │
-│  /taxbro-check-childcare     → Form 2441 earned income test     │
-│  /taxbro-rental-income → Schedule E + INR→USD conversion        │
-│  /taxbro-generate-worksheets → pre-filled IRS form line items   │
-│  /taxbro-visualize           → interactive HTML dashboard       │
-│  /taxbro-validate-return     → cross-check draft return PDF     │
-│                                                                 │
-│  Each skill reads US-knowledge-graph.md first.                  │
-│  No raw documents re-read unless a fact is missing.             │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  OUTPUTS — all written to {YOUR_TAX_FOLDER}/TAXBRO/             │
-│                                                                 │
-│  US-knowledge-graph.md       US-checklist.md                    │
-│  US-w2-summary.md            US-fbar-summary.md                 │
-│  US-pfic-summary.md          US-ftc-summary.md                  │
-│  US-childcare-summary.md     US-rental-income.md                │
-│  US-worksheets.md            US-validation-report.md            │
-│  US-knowledge-graph.html                                       │
-│                                                                 │
-│  ⚠️  Keep this folder private — it contains your financial data │
-│  ✅  Nothing sensitive ever touches the TaxBro repo itself       │
-└─────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------+
+|                       YOUR TAX FOLDER                         |
+|                                                               |
+|  W-2s  1099s  1098s  Bank Statements  CAMS CAS  AIS/TIS      |
+|  Childcare Receipts  Interest Certs  Advance Tax Challans     |
++-----------------------------+---------------------------------+
+                              |
+                   /taxbro-init (discover)
+                              |
+                              v
++---------------------------------------------------------------+
+|  /taxbro-extract                                              |
+|                                                               |
+|  Reads every document once. Extracts facts, not content.      |
+|  Runs 15 cross-document checks. Computes totals.              |
+|                                                               |
+|              +--------------------------------------+         |
+|              |   US-knowledge-graph.md              |         |
+|              |                                      |         |
+|              |   Issues & Flags                     |         |
+|              |   Income (W-2 / 1099 / HSA)          |         |
+|              |   Foreign Income + Rental            |         |
+|              |   Deductions + Childcare             |         |
+|              |   Foreign Accounts (FBAR)            |         |
+|              |   PFIC / Mutual Funds                |         |
+|              |   Credits (FTC, Excess SS)            |         |
+|              |   Payments + Estimated Tax            |         |
+|              |   Computed Totals (AGI -> Refund)     |         |
+|              +--------------------------------------+         |
++---------------------------------------------------------------+
+                              |
+                              v
++---------------------------------------------------------------+
+|  DOWNSTREAM SKILLS (all read from knowledge graph)            |
+|                                                               |
+|  /taxbro-visualize     --> interactive HTML dashboard         |
+|  /taxbro-compliance    --> FBAR + PFIC + FTC deep dive        |
+|  /taxbro-worksheets    --> preparer-ready IRS form line items |
+|  /taxbro-validate-return --> cross-check draft return PDF     |
++---------------------------------------------------------------+
+                              |
+                              v
++---------------------------------------------------------------+
+|  OUTPUTS -- all in {YOUR_TAX_FOLDER}/TAXBRO/                  |
+|                                                               |
+|  US-knowledge-graph.md      US-knowledge-graph.html           |
+|  US-compliance-summary.md   US-worksheets.md                  |
+|  US-validation-report.md    session-notes.md                  |
+|                                                               |
+|  [!] Keep this folder private -- it contains financial data   |
+|  [*] Nothing sensitive ever touches the TaxBro repo itself    |
++---------------------------------------------------------------+
 ```
 
 ---
 
 ## The Knowledge Graph
 
-`US-knowledge-graph.md` is TaxBro's central data structure. Every analysis skill reads from it rather than re-reading source documents. It has two key design principles:
+`US-knowledge-graph.md` is TaxBro's central data structure. It has three design principles:
 
-**Extract facts, not content.** A bank statement might be 40 pages of transactions. The graph stores three numbers: maximum balance during the year, December 31 balance, and total interest earned. Everything else is discarded. This keeps the graph compact (a few hundred lines) while preserving everything needed for FBAR thresholds, Schedule B, and Form 1116.
+**Extract facts, not content.** A bank statement might be 40 pages. The graph stores three numbers: max balance, Dec 31 balance, and interest earned.
 
-**Link, don't embed.** When a fact is too complex to summarize, the graph records the source document path and the relevant section. Skills that need more detail can go read it — but most don't need to.
+**Link, don't embed.** Every value includes a source document citation. Skills that need more detail can go read the file.
 
-A few things the graph enables that would otherwise require re-reading every document each time:
+**Compute once, use everywhere.** The "Computed Totals" section pre-computes income, AGI, taxable income, estimated tax, and refund/owe. All downstream skills read these totals instead of independently recomputing — this prevents agent drift when different models (Claude vs Gemini) interpret the same data differently.
 
-- **Excess Social Security**: computed once across all W-2s, stored as a single flag. No per-W-2 re-read needed.
-- **FBAR threshold check**: all foreign account maximums summed in one place. The threshold question is answered at extraction time.
-- **Form 2441 earned income test**: the spouse's earned income (or the student/disability exception) is recorded once and referenced by `/taxbro-check-childcare` directly.
-- **AIS reconciliation**: income from Indian AIS statements is cross-checked against what bank statements show as deposits, flagged if inconsistent.
-- **PFIC de minimis**: all PFIC values summed and compared against the $25K per-fund and $50K aggregate thresholds at extraction time.
-
-The graph uses confidence markers on every value:
+The graph uses confidence markers:
 
 | Marker | Meaning |
 |--------|---------|
@@ -118,123 +120,17 @@ The graph uses confidence markers on every value:
 
 ---
 
-## Workflow
-
-### Standard workflow
-
-```
-/taxbro-init /path/to/your/tax/folder/
-/taxbro-next
-```
-
-`/taxbro-next` is the status-aware orchestrator. Run it after initialization to see exactly where you are and what to do next. It builds an ASCII checklist and can automatically trigger the next required skill.
-
-After `/taxbro-checklist` shows you what needs attention, work through the topics. The checklist output is prioritized — critical items (🔴) first, then items needing attention (⚠️), then clear items (✅).
-
-If you need deeper analysis on a specific area:
-```
-/taxbro-check-fbar
-/taxbro-check-pfic
-/taxbro-check-childcare
-```
-
-When everything looks good:
-```
-/taxbro-generate-worksheets
-/taxbro-visualize
-```
-
-The visualization creates an interactive HTML dashboard you can open in any browser — shows a tax waterfall, how each item impacts your bottom line, threshold progress bars for FBAR/PFIC, and a full 1040 line-by-line worksheet.
-
-Once your preparer sends a draft:
-```
-/taxbro-validate-return /path/to/draft-return.pdf
-```
-
-### Starting fresh
-
-If you want to start over (new documents added, prior run was incomplete):
-```
-/taxbro-init --reset
-/taxbro-extract
-```
-
-`--reset` archives your existing TAXBRO/ outputs to a timestamped snapshot before reinitializing. Nothing is ever deleted — snapshots are preserved indefinitely.
-
-### Check status at any time
-```
-/taxbro --status
-```
-
-Prints a compact key:value summary: which folder is loaded, which outputs exist (with dates), and what to do next.
-
----
-
-## Install
-
-```bash
-git clone https://github.com/kbrovibes/taxbro ~/claude/taxbro
-cd ~/claude/taxbro
-claude
-```
-
-Claude Code auto-discovers `.claude/commands/` and registers all skills.
-
-**Prerequisites:** [Claude Code](https://claude.ai/code) (the CLI) + a folder of tax documents.
-
----
-
-## Personalizing with CLAUDE.md
-
-Add a `CLAUDE.md` to your tax documents folder. Every skill reads it before running. The more context you provide, the more targeted the analysis — especially for missing document detection and checklist prioritization.
-
-```markdown
-# Tax Return 2025 — Context
-
-## Filers
-- Primary: [Name] — W-2, two employers (job change)
-- Spouse: [Name] — not working (Form 2441 student exception applies)
-- Filing status: MFJ
-
-## Key situations
-- [x] Two W-2s (job change mid-year)
-- [x] Two mortgage properties (1098 from each)
-- [x] Childcare (1 child, 2 providers)
-- [x] HSA (employee + employer contributions)
-- [x] Foreign accounts: India (ICICI NRE, SBI NRO), Canada (Scotiabank)
-- [x] Indian mutual funds — CAMS CAS on file (PFIC risk)
-- [x] Indian rental property (50% ownership)
-- [x] Indian bank interest + TDS (Form 1116 passive basket)
-- [x] India advance tax payments (Form 1116 general basket)
-- [ ] Canadian T4 (confirmed: no employment income in Canada 2025)
-
-## Notes
-- Prior year QEF elections: none — all PFICs on default excess distribution method
-- Rental depreciation basis established in 2021 return (30-year foreign residential)
-```
-
----
-
 ## All commands
 
 | Command | Purpose |
 |---------|---------|
-| `/taxbro` | Overview: commands, session status, output file reference |
-| `/taxbro --status` | Compact key:value status of current session |
 | `/taxbro-init [path]` | Load source folder, discover documents |
 | `/taxbro-init --reset` | Archive existing outputs to snapshot, start fresh |
-| `/taxbro-next` | **Identify and execute the next eligible command (orchestrator)** |
-| `/taxbro-extract` | **Read all documents → build US-knowledge-graph.md** (run before checklist) |
-| `/taxbro-checklist` | Full status check and topic-by-topic review (reads knowledge graph) |
-| `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding |
-| `/taxbro-check-fbar` | Foreign accounts: FBAR / Form 8938 thresholds |
-| `/taxbro-check-pfic` | PFIC: Form 8621 determination per fund |
-| `/taxbro-foreign-tax-credit` | Foreign taxes by basket → Form 1116 |
-| `/taxbro-check-childcare` | Childcare: Form 2441 earned income test |
-| `/taxbro-rental-income` | Foreign rental income → Schedule E |
-| `/taxbro-generate-worksheets` | Pre-filled line items for all applicable IRS forms |
-| `/taxbro-visualize` | Interactive HTML dashboard — tax waterfall, item impacts, global assets |
-| `/taxbro-validate-return [pdf]` | Cross-check draft/final return PDF against source docs |
+| `/taxbro-extract` | **Read all documents, build knowledge graph with full analysis** |
+| `/taxbro-visualize` | Interactive HTML dashboard — tax waterfall, per-item impact, threshold bars |
+| `/taxbro-compliance` | Deep dive: FBAR + Form 8938 + PFIC/Form 8621 + FTC/Form 1116 |
+| `/taxbro-worksheets` | Preparer-ready IRS form line items |
+| `/taxbro-validate-return [pdf]` | Cross-check a completed/draft return PDF against source docs |
 
 ---
 
@@ -244,37 +140,47 @@ All outputs go to `{SOURCE_FOLDER}/TAXBRO/`. Keep this folder private.
 
 | File | Produced by | Contents |
 |------|-------------|---------|
-| `session-notes.md` | `/taxbro-init` | Document counts, missing doc flags, initialization log |
-| `US-knowledge-graph.md` | `/taxbro-extract` | All extracted facts, cross-checks, flags |
-| `US-checklist.md` | `/taxbro-checklist` | Prioritized topic review with status and next actions |
-| `US-w2-summary.md` | `/taxbro-check-w2s` | W-2 table, excess SS, DCFSA/HSA flags |
-| `US-fbar-summary.md` | `/taxbro-check-fbar` | Account balances, FBAR/8938 determinations |
-| `US-pfic-summary.md` | `/taxbro-check-pfic` | Fund table, de minimis check, Form 8621 per fund |
-| `US-ftc-summary.md` | `/taxbro-foreign-tax-credit` | Foreign taxes by basket, FTC limitation note |
-| `US-childcare-summary.md` | `/taxbro-check-childcare` | Provider table, DCFSA offset, Form 2441 eligibility |
-| `US-rental-income.md` | `/taxbro-rental-income` | Monthly rent, USD conversion, Schedule E summary |
-| `US-worksheets.md` | `/taxbro-generate-worksheets` | Pre-filled line items for all applicable forms |
-| `US-knowledge-graph.html` | `/taxbro-visualize` | Interactive dashboard — tax waterfall, item impacts, global assets |
+| `session-notes.md` | `/taxbro-init` | Document inventory, initialization log |
+| `US-knowledge-graph.md` | `/taxbro-extract` | All facts, cross-checks, flags, computed totals |
+| `US-knowledge-graph.html` | `/taxbro-visualize` | Interactive dashboard |
+| `US-compliance-summary.md` | `/taxbro-compliance` | FBAR/PFIC/FTC filing determinations and detail |
+| `US-worksheets.md` | `/taxbro-worksheets` | Pre-filled IRS form line items |
 | `US-validation-report.md` | `/taxbro-validate-return` | Line-by-line cross-check results |
+
+---
+
+## Multi-agent support
+
+TaxBro works with both Claude Code and Gemini CLI:
+
+| Skill | Recommended agent | Why |
+|-------|-------------------|-----|
+| `/taxbro-extract` | **Gemini** | 1M+ context window for 30-40 PDFs |
+| `/taxbro-visualize` | **Claude** | Complex self-contained HTML generation |
+| `/taxbro-validate-return` | **Claude** | Nuanced cross-checking |
+| All others | Either | |
+
+Skills live in `.agents/commands/`. Claude reads via `.claude/commands/` (symlink). Gemini reads directly.
 
 ---
 
 ## Supported forms
 
-| Form | Handled by |
+| Form | Covered by |
 |------|-----------|
-| Form 1040 (key lines) | `/taxbro-generate-worksheets` |
-| W-2 excess SS credit (Schedule 3) | `/taxbro-check-w2s` |
-| Schedule B (interest, dividends, Part III) | `/taxbro-extract`, `/taxbro-validate-return` |
-| Schedule E (foreign rental) | `/taxbro-rental-income` |
-| Schedule D / Form 8949 | `/taxbro-checklist` (presence check) |
-| Form 1098 (mortgage interest) | `/taxbro-extract`, `/taxbro-checklist` |
-| Form 2441 (childcare credit) | `/taxbro-check-childcare` |
-| FinCEN 114 (FBAR) | `/taxbro-check-fbar` |
-| Form 8938 (FATCA) | `/taxbro-check-fbar` |
-| Form 8621 (PFIC) | `/taxbro-check-pfic` |
-| Form 1116 (foreign tax credit) | `/taxbro-foreign-tax-credit` |
-| Form 8889 (HSA) | `/taxbro-extract`, `/taxbro-checklist` |
+| Form 1040 (key lines) | `/taxbro-extract` (Computed Totals), `/taxbro-worksheets` |
+| W-2 excess SS credit | `/taxbro-extract` (cross-checks) |
+| Schedule B (interest, Part III) | `/taxbro-extract`, `/taxbro-compliance` |
+| Schedule D / Form 8949 | `/taxbro-extract` (RSU basis adjustment) |
+| Schedule E (foreign rental) | `/taxbro-extract` |
+| Form 1098 (mortgage) | `/taxbro-extract` (TCJA cap analysis) |
+| Form 2441 (childcare) | `/taxbro-extract` (DCFSA/IRC 129 analysis) |
+| Form 2210 (underpayment) | `/taxbro-extract` (quarterly attribution) |
+| FinCEN 114 (FBAR) | `/taxbro-compliance` |
+| Form 8938 (FATCA) | `/taxbro-compliance` |
+| Form 8621 (PFIC) | `/taxbro-compliance` |
+| Form 1116 (FTC) | `/taxbro-compliance` |
+| Form 8889 (HSA) | `/taxbro-extract` |
 
 ---
 
@@ -284,7 +190,6 @@ All outputs go to `{SOURCE_FOLDER}/TAXBRO/`. Keep this folder private.
 - **All outputs go to `{SOURCE_FOLDER}/TAXBRO/`** — your folder, your control
 - **`.current-session`** contains only a path — it is gitignored
 - **Never commit your `TAXBRO/` folder** — it contains financial data
-- **Nothing in TaxBro's memory** ever contains dollar amounts, names, or account details — only methodological notes like "NRE interest is US-taxable"
 
 ---
 
