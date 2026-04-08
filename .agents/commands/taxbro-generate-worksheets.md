@@ -1,10 +1,20 @@
 Generate pre-filled worksheets for all applicable IRS forms based on source documents.
 Outputs structured, line-item-ready reference documents your preparer or tax software can enter directly.
 
+⚠️ COMPUTATION RULE: Read the "Computed Totals" section of US-knowledge-graph.md FIRST.
+Use those pre-computed values for total income, AGI, taxable income, total tax, total payments,
+and refund/owe. Do NOT independently recompute these from raw sections — this causes agent drift.
+Always use ADJUSTED capital gain (after RSU basis correction), not the face 1099-B value.
+Total interest = US 1099-INT + India NRE (USD) + India NRO (USD).
+
 Steps:
 1. Get source folder from $ARGUMENTS or .current-session.
 
 2. Read CLAUDE.md to understand which forms apply to this filer.
+
+2b. **Read `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.md` — specifically the "Computed Totals" section.**
+    All line amounts in the Form 1040 worksheet MUST match the Computed Totals. If Computed Totals
+    is missing, compute the values yourself following the formulas in the extract schema and note "⚠️ no Computed Totals — verify".
 
 3. Check which TaxBro analysis outputs already exist in {SOURCE_FOLDER}/TAXBRO/:
    - US-fbar-summary.md → drives FinCEN 114 worksheet

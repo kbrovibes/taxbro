@@ -3,6 +3,10 @@ Run a comprehensive tax status review for the loaded source folder.
 This skill is knowledge-graph-first: it reads US-knowledge-graph.md when available (built by /taxbro-extract),
 and falls back to raw document scanning only if the graph has not been built yet.
 
+⚠️ COMPUTATION RULE: When citing dollar amounts, use values from the "Computed Totals" section of the
+knowledge graph. Do NOT independently recompute. Use ADJUSTED capital gain (after RSU basis correction).
+Total interest = US 1099-INT + India NRE (USD) + India NRO (USD).
+
 Steps:
 1. Get source folder:
    - If $ARGUMENTS is provided, use that path.

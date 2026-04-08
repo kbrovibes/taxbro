@@ -8,6 +8,33 @@
 
 ---
 
+## ⚠️ COMPUTATION RULES — Read Before Every Skill
+
+These rules prevent the #1 source of errors: agents computing different numbers for the same thing.
+
+### Rule 1: Use Adjusted Values, Never Face Values
+- **Capital gains**: Always use the **adjusted** 1099-B gain (after RSU basis correction), NOT the face value from the 1099-B. If the knowledge graph has both, use the one in the "Computed Totals" section.
+- **Interest income**: Total = US interest (1099-INT) + India NRE interest (USD) + India NRO interest (USD). All three must be summed.
+- **Rental income**: Use the **net** figure (after depreciation and PAL carryforward), not gross rent.
+
+### Rule 2: Read "Computed Totals" First
+The knowledge graph (`US-knowledge-graph.md`) has a **"Computed Totals"** section at the bottom. If it exists, use those numbers as-is for:
+- Total income, AGI, taxable income, estimated tax, total payments, refund/owe
+- Do NOT recompute these from the raw sections — the totals section IS the single source of truth.
+
+### Rule 3: Show Your Math
+When writing any dollar amount that requires calculation (not directly from a document), show the formula inline:
+- Good: `$287,865 ~ (Fidelity adjusted: $413,273 proceeds − $125,408 adjusted basis)`
+- Bad: `$287,865`
+
+### Rule 4: Cross-Check Before Writing
+Before writing any output file, verify:
+- Does your total income match the Computed Totals section?
+- Does your refund/owe estimate match?
+- If not, you have an error. Re-read the knowledge graph.
+
+---
+
 ## Invoking Skills
 
 When the user types `/skill-name` (e.g. `/taxbro-extract`):

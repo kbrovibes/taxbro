@@ -434,6 +434,72 @@ _Note: FTC cannot exceed (foreign income / total income) × US tax. Excess carri
 | File | Category | Extracted | Notes |
 |---|---|---|---|
 | | | ✓ / ✗ / [unreadable] | |
+
+---
+
+## Computed Totals (Single Source of Truth)
+<!-- CRITICAL: All downstream skills (/taxbro-generate-worksheets, /taxbro-visualize, /taxbro-checklist)
+     MUST read these totals instead of recomputing from raw sections. This prevents agent drift. -->
+
+### Income Aggregation
+| Line | Description | Amount | Formula / Source |
+|---|---|---|---|
+| Wages (1040 Line 1a) | W-2 Box 1 total | $ | Sum of W-2 table |
+| Taxable Interest (1040 Line 2b) | US + foreign interest | $ | US 1099-INT total + NRE interest (USD) + NRO interest (USD) |
+| Ordinary Dividends (1040 Line 3b) | | $ | 1099 consolidated Ord Div total |
+| Qualified Dividends (1040 Line 3a) | | $ | 1099 consolidated Qual Div total |
+| Capital Gain (1040 Line 7) | Net, after basis adjustments | $ | **Use adjusted 1099-B gain, NOT face value.** If RSU basis adjusted: state adjusted amount explicitly |
+| Rental Income (Sch 1 Line 5) | Net after depreciation + PAL | $ | Gross rent (USD) − depreciation − expenses + prior PAL applied |
+| **Total Income (1040 Line 9)** | | **$** | Sum of all above |
+
+### Key Adjustments
+| Item | Amount | Notes |
+|---|---|---|
+| HSA deduction (8889 Line 13) | $ | 5498-SA total − employer contributions (Box 12W) |
+| **Adjusted Gross Income (Line 11)** | **$** | Total Income − adjustments |
+
+### Tax Computation Reference
+| Item | Amount | Notes |
+|---|---|---|
+| Standard Deduction (MFJ 2025) | $30,000 | Or itemized if larger |
+| Itemized — Mortgage interest (deductible portion) | $ | Total interest × ($750K ÷ outstanding principal); show ratio |
+| Itemized — SALT (capped) | $10,000 | Property tax $X but capped at $10K |
+| Itemized — Charitable | $ | If applicable |
+| **Estimated Itemized Total** | **$** | |
+| **Better of Standard/Itemized** | **$** | |
+| **Taxable Income (Line 15)** | **$** | AGI − deduction |
+
+### Tax & Credits Estimate
+| Item | Amount | Notes |
+|---|---|---|
+| Regular tax (from brackets) | $ | Use 2025 MFJ brackets: 10/12/22/24/32/35/37% |
+| Additional Medicare Tax (0.9%) | $ | 0.9% × (wages − $250K MFJ threshold) |
+| Net Investment Income Tax (3.8%) | $ | 3.8% × min(NII, MAGI − $250K); NII = cap gains + dividends + interest + rental |
+| **Estimated Total Tax** | **$** | Regular + AMT + Additional Medicare + NIIT |
+
+### Payments & Credits
+| Item | Amount | Source |
+|---|---|---|
+| W-2 withholding (total) | $ | |
+| 1099 withholding (total) | $ | |
+| Estimated tax payments (1040-ES) | $ | |
+| Excess SS credit (Schedule 3) | $ | |
+| Foreign tax credit (Form 1116) | $ | |
+| Child tax credit | $ | $2,000 per qualifying child under 17 |
+| **Total Payments + Credits** | **$** | |
+
+### Bottom Line
+| Item | Amount |
+|---|---|
+| Estimated Total Tax | $ |
+| Total Payments + Credits | $ |
+| **Estimated Refund / (Owe)** | **$** |
+| Form 2210 penalty estimate | $ |
+| **Net Refund / (Owe) after penalty** | **$** |
+
+_⚠️ These are ESTIMATES using simplified bracket math. Actual return will differ due to:_
+_qualified dividend/LTCG preferential rates, AMT calculation, Form 1116 limitation, Schedule D worksheet._
+_Purpose: provide a directional "are we in refund or owe territory" answer and catch gross errors._
 ```
 
 ---

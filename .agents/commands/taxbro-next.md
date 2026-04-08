@@ -17,7 +17,17 @@ Usage:
 4. Read `{SOURCE_FOLDER}/TAXBRO/session-notes.md` (from /taxbro-init).
 5. Read `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.md` (from /taxbro-extract).
 6. Read `{SOURCE_FOLDER}/TAXBRO/US-checklist.md` (from /taxbro-checklist).
-7. List `{SOURCE_FOLDER}/TAXBRO/` to see all generated artifacts (US-*.md).
+7. List `{SOURCE_FOLDER}/TAXBRO/` **with modification timestamps** to see all generated artifacts.
+   Use: `ls -lt "{SOURCE_FOLDER}/TAXBRO/"` (or equivalent) to capture file modification times.
+
+### Staleness Detection
+If `US-knowledge-graph.md` was modified AFTER any downstream artifact (US-*-summary.md,
+US-worksheets.md, US-checklist.md, US-knowledge-graph.html), that artifact is **stale** —
+it was built from an older version of the knowledge graph.
+
+Mark stale artifacts as `[!] STALE` in the status checklist instead of `[X]`.
+When determining the next command, treat stale artifacts as if they don't exist
+(i.e., re-run the corresponding skill).
 
 ---
 
