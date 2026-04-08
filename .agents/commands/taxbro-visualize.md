@@ -49,51 +49,44 @@ Opens in any browser. Self-contained — no server required.
 ## HTML Design Requirements
 
 The dashboard should be a single self-contained HTML file (no external files needed):
-- Professional dark-mode design (#0f172a background, slate/blue/green palette)
-- Uses libraries loaded from CDN (vis-network for graph, Chart.js for charts, Alpine.js for interactivity)
-- **High-Signal UI:** Prioritize the "bottom line" (Refund vs. Owe) and "Action Required" items.
+- **Professional Analytics UI:** Dark-mode design (#0f172a background) using Tailwind-style components.
+- **Goal:** Provide a complete "Truth Source" that explains the tax outcome and highlights every document's impact.
 
 ### Layout: Sidebar + Main panel
 
 **Left sidebar (fixed, ~240px):**
-- App title "TaxBro" with tax year badge
-- Navigation links: 🎯 Summary, ✅ Checklist, 💰 Income & Tax, 🌍 Global Assets, 📐 Return Δ, 📄 Documents
-- **Outcome Badge:** Large "EST. REFUND" or "EST. OWE" amount shown prominently in the sidebar
-- Issue count badges by severity (🔴 N critical, ⚠️ N attention)
-- "Generated: YYYY-MM-DD" footer
+- App title "TaxBro Insight" with tax year
+- **Bottom Line:** Prominent "EST. REFUND/OWE" amount.
+- Navigation: 📊 Dashboard, 🧠 Audit Logic, 📑 1040 Worksheet, 📋 To-Do & Issues, 🌍 Global Assets, 📄 Documents
+- **Quick Stats:** 🔴 Issues count, ❓ Questions count, 📑 Docs processed.
 
-**Main content area (scrollable, tabbed):**
+**Main content area (scrollable):**
 
-#### Tab 1 — 🎯 Summary (Condensed)
-- **Bottom Line Card:** Big, bold calculation: (Payments + Credits) - (Estimated Tax) = Refund/Owe.
-- **Top 3 Actions:** The most critical red-flag items from the knowledge graph.
-- **Exposure Map:** Simple cards for India/Canada/US highlighting if FBAR/FATCA/FTC apply.
-- **Status Progress:** A progress bar showing % of tax documents processed and validated.
+#### Tab 1 — 📊 Dashboard (The Big Picture)
+- **Outcome Summary:** (Total Cash Paid) - (Total Tax Liability) = Refund/Owe.
+- **Income Doughnut:** Breakdown of where money came from.
+- **Tax vs Cash Bar:** Visualizing how much of the "Total Tax" is covered by W-2 withholding vs. other payments.
 
-#### Tab 2 — ✅ Checklist
-- **Command Status:** An interactive version of the /taxbro-next checklist.
-- [X] Extract | [X] W-2s | [X] FBAR | [ ] Validation | etc.
-- **Open Issues:** Grouped list of all 🔴 and ⚠️ flags with "Fix/Verify" instructions.
+#### Tab 2 — 🧠 Audit Logic (The "Touchpoints")
+- **The "Why" Section:** Explain exactly how major items (Mortgage Cap, RSU Basis, Penalties) impact the final number.
+- **CPA Delta Bridge:** Specific callouts for items that might cause a discrepancy with a human preparer.
 
-#### Tab 3 — 💰 Income & Tax
-- **Income Breakdown:** Doughnut chart of income sources.
-- **Tax vs. Payments:** Side-by-side bar chart showing (W-2 Withholding + Estimates) vs. (Ordinary Tax + NIIT + Addl Medicare Tax).
-- **Credits & Deductions:** List of key tax savers (Excess SS, FTC, Itemized Deductions).
+#### Tab 3 — 📑 1040 Worksheet (Line-by-Line Breakdown)
+- **Comprehensive Table:** Every major line of Form 1040.
+- **Columns:** Form/Line | Description | Source Value | Status (✅/⚠️) | Logic/Note.
+- **Detail:** Show the transition from Gross Income -> Adjusted Gross Income -> Taxable Income.
+- **Calculations:** Explicitly show how complex lines (e.g., Line 7 Capital Gains or Schedule A Mortgage Interest) were derived.
 
-#### Tab 4 — 🌍 Global Assets (FBAR/PFIC)
-- **FBAR Table:** Simplified with "Action Needed" column.
-- **PFIC Status:** Aggregate value vs $50K threshold (Progress bar).
-- **Threshold Alerts:** Clear indicators for Form 8938 and FBAR filing requirements.
+#### Tab 4 — 📋 To-Do & Issues
+- **Questions for User:** Explicit list of information needed to finalize the return.
+- **System Issues:** Grouped list of 🔴 and ⚠️ flags from the knowledge graph.
 
-#### Tab 5 — 📐 Return Δ (Validation)
-- Header: Return filename and verification status.
-- **Delta Table:** Condensed view of Form/Line | Source | Return | Δ.
-- **Color-coded rows:** PASS (Green), FLAG (Amber), MISMATCH (Red).
-- **Preparer Follow-up:** List of items that need manual verification by the CPA.
+#### Tab 5 — 🌍 Global Assets
+- Detailed tables for FBAR, FATCA, and PFIC status.
+- Threshold progress bars.
 
 #### Tab 6 — 📄 Documents
-- Searchable registry of all 70+ documents.
-- Status indicator for each (Read/Flagged/Skipped).
+- Searchable registry of all source files.
 
 ---
 
