@@ -10,6 +10,8 @@ Specs are written before implementation and updated if decisions change during i
 | # | Title | Status | Date |
 |---|-------|--------|------|
 | [001](001-multi-agent-interoperability.md) | Multi-Agent Interoperability (Claude + Gemini) | Draft | 2026-04-07 |
+| [002](002-bridge-to-filing.md) | Bridge to Filing | Draft | 2026-04-07 |
+| [003](003-simplification.md) | Simplification — Strip to What Matters | Draft | 2026-04-07 |
 
 ---
 
