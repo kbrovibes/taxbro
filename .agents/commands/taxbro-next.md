@@ -62,7 +62,8 @@ Follow this priority list (from top to bottom):
    - If multiple are missing, pick the first one listed.
 5. **If all relevant analysis is done but no `US-worksheets.md`:** Next = `/taxbro-generate-worksheets`
 6. **If worksheets exist but no `US-validation-report.md`:** Next = `/taxbro-validate-return`
-7. **If everything is complete:** Suggest `/taxbro-visualize` or tell the user the return is ready for final review.
+7. **If all relevant analysis and worksheets exist but no `US-knowledge-graph.html`:** Next = `/taxbro-visualize`
+8. **If everything is complete:** Tell the user the return is ready for final review and suggest opening the visualization dashboard.
 
 ---
 
