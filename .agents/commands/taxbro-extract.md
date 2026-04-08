@@ -32,6 +32,35 @@ Usage:
 
 ## Step 2 — Extract by Category
 
+### Parallel Extraction (Claude Code)
+
+When running in Claude Code, use the Agent tool to extract categories in parallel.
+The categories below are **independent** — they read different documents and produce
+separate knowledge graph sections. Launch them as parallel subagents:
+
+**Batch 1 (launch simultaneously):**
+- Agent 1: W-2 + 1099 Consolidated + 1099-INT + 1099-SA + 5498-SA + 1099-R
+- Agent 2: Foreign Bank Statements + Interest Certificates + Form 16A / TDS Certificates
+- Agent 3: CAMS CAS / Mutual Fund Statements (PFIC) + AIS/TIS
+- Agent 4: 1098 (Mortgage) + Childcare Provider Statements + Advance Tax Challans + Prior Year Return
+
+Each agent receives: SOURCE_FOLDER path, file list for its category, exchange rate,
+filer context from CLAUDE.md. Each agent returns its extracted section as markdown text.
+
+**After all agents complete:**
+- Merge all sections into the knowledge graph schema
+- Run cross-document checks (Step 3) — these require data from multiple categories
+- Compute the "Computed Totals" section (Step 4b)
+- Write the final `US-knowledge-graph.md`
+
+### Sequential Extraction (Gemini)
+
+When running in Gemini CLI, process all categories sequentially in a single pass.
+Gemini's large context window can hold all 73 documents at once, so parallelism
+is unnecessary — just read everything and extract in order.
+
+---
+
 Read each document category below. Extract ONLY the specified facts — do not copy full content.
 For every fact, record the source filename as a relative path from SOURCE_FOLDER.
 
