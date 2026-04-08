@@ -112,18 +112,26 @@ Part II:
 
 ---
 
+### WORKSHEET: Form 2210 (Underpayment of Estimated Tax)
+Required for high-income earners with significant non-wage income (stocks/rental).
+- **Quarterly Income Attribution:** 
+  - Q1 (Jan–Mar): List significant realized gains/bonuses.
+  - Q2 (Apr–May): List significant realized gains/bonuses.
+  - Q3 (Jun–Aug): List significant realized gains/bonuses.
+  - Q4 (Sep–Dec): List significant realized gains/bonuses.
+- **Estimated Tax Payments:**
+  - Date and Amount for each payment (must match 1040-ES receipts).
+- **Penalty Calculation:**
+  - Estimate penalty = (Required Annual Payment - Withholding) × IRS interest rate (approx 8% for 2025) weighted by quarter.
+  - Note: This amount should be **subtracted** from the final Refund or **added** to the Balance Due.
+
+---
+
 ### WORKSHEET: Form 1040 — Key Lines Summary
-- Line 1a: W-2 wages (total Box 1)
-- Line 2b: Taxable interest (US + foreign NRE/NRO)
-- Line 3b: Ordinary dividends
-- Line 3a: Qualified dividends
-- Line 5b: IRA/pension distributions (if any)
-- Line 7: Capital gain or loss (net from brokerages)
-- Schedule 1 Line 8: Other income (rental net, if positive)
-- Schedule A: Mortgage interest (if itemizing)
-- Line 19: Child tax credit
-- Line 13: Foreign tax credit (from Form 1116)
-- Line 11: Excess SS tax withheld (from w2-summary)
+...
+- Line 34: Overpayment (Refund)
+- Line 38: Estimated Penalty (from Form 2210 worksheet)
+- **Net Outcome:** Overpayment - Penalty.
 
 ---
 

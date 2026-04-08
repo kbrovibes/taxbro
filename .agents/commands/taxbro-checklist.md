@@ -40,6 +40,7 @@ Steps:
    **Income & Withholding**
    - [ ] W-2(s) — all employers present; excess SS check done
    - [ ] 1099-B/DIV/INT — all brokerages present; wash sale review needed
+   - [ ] Form 2210 Risk — check if 1040-ES payments (from US-knowledge-graph.md) were made timely (Apr/Jun/Sep/Jan) or if a penalty is likely due to Q4-only payments.
    - [ ] 1099-SA / 5498-SA — HSA distribution and contribution limit check
 
    **Deductions & Credits**
