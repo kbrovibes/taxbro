@@ -122,8 +122,9 @@ Required for high-income earners with significant non-wage income (stocks/rental
 - **Estimated Tax Payments:**
   - Date and Amount for each payment (must match 1040-ES receipts).
 - **Penalty Calculation:**
+  - **Required Annual Payment:** The *lesser* of (a) 90% of current year tax or (b) 110% of prior year tax (for high earners).
   - Estimate penalty = (Required Annual Payment - Withholding) × IRS interest rate (approx 8% for 2025) weighted by quarter.
-  - Note: This amount should be **subtracted** from the final Refund or **added** to the Balance Due.
+  - **Critical:** If income was earned late in the year (e.g., Q4 stock gains), note that the **Annualized Income Method (Schedule AI)** will likely reduce this penalty significantly.
 
 ---
 
