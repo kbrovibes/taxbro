@@ -30,5 +30,7 @@ Steps:
    - Form 2441 earned-income flag (if applicable)
    - Any other notable Box 12 items
 
+6. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: This file IS written to the source TAXBRO folder (financial data belongs there, not here).
 Never write financial data to ~/claude/taxbro/.

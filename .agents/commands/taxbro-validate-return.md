@@ -101,5 +101,7 @@ VALIDATION CHECKS:
 
 7. Print a brief summary to the user: total checks run, pass/flag/mismatch counts, and top issues to review.
 
+8. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-validation-report.md only.
 Never write financial data to ~/claude/taxbro/.

@@ -42,5 +42,7 @@ Steps:
    - List of accounts to include on Schedule B Part III
    - Flag any account where statement is missing or balance unclear
 
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-fbar-summary.md only.
 Never write financial data to ~/claude/taxbro/.

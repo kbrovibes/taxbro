@@ -42,6 +42,8 @@ Opens in any browser. Self-contained — no server required.
    delta_na (bool — true when delta is not meaningful e.g. gross vs. taxable), status, note.
 8. Write a self-contained HTML file to `{SOURCE_FOLDER}/TAXBRO/US-knowledge-graph.html`.
 
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 ---
 
 ## HTML Design Requirements

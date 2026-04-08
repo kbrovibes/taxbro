@@ -2,6 +2,7 @@ Analyze childcare expenses and determine Form 2441 (Child and Dependent Care Cre
 
 Steps:
 1. Get source folder from $ARGUMENTS or .current-session.
+   Read `{SOURCE_FOLDER}/TAXBRO/agent-log.md` if it exists. Note any prior runs of this skill or related skills to avoid redundancy.
 
 2. Read CLAUDE.md for:
    - Number of qualifying children
@@ -40,6 +41,8 @@ Steps:
    - Net qualifying expenses
    - Estimated credit (with earned-income caveat if applicable)
    - Form 2441 eligibility determination and any flags
+
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
 
 IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-childcare-summary.md only.
 Never write financial data to ~/claude/taxbro/.

@@ -41,6 +41,8 @@ next:         <one-line suggestion: e.g. "run /taxbro-extract to build knowledge
 Use `stat -f "%Sm" -t "%Y-%m-%d"` (macOS) to get mtime. If stat fails, omit the date.
 Never print balances, names, SSNs, or any content from documents — structural metadata only.
 
+6. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written (none), key findings, and suggested next steps.
+
 ---
 
 ## FULL OVERVIEW MODE
@@ -63,6 +65,7 @@ Display all commands in a table with command name and purpose:
 | Command | Purpose |
 |---------|---------|
 | `/taxbro-init [path]` | Load source folder, read CLAUDE.md, discover documents |
+| `/taxbro-next` | **Identify and execute the next eligible command (orchestrator)** |
 | `/taxbro-extract` | **Read all documents → build US-knowledge-graph.md** (run this first) |
 | `/taxbro-checklist` | Full status check and topic-by-topic review (reads knowledge graph) |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |

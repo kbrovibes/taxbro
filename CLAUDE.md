@@ -20,6 +20,7 @@ This reads the source folder's `CLAUDE.md` (if present), discovers documents, an
 
 ### 2. Run any skill
 ```
+/taxbro-next
 /taxbro-checklist
 /taxbro-check-w2s
 /taxbro-check-fbar
@@ -34,6 +35,7 @@ You can also pass the path directly: `/taxbro-check-fbar /path/to/taxes/`
 ### 0. Get an overview
 ```
 /taxbro
+/taxbro-next --show
 ```
 Shows all commands, current session status, and output file reference.
 
@@ -107,6 +109,7 @@ When pointed at a source folder, TaxBro expects:
 |---------|---------|
 | `/taxbro` | Show all commands, session status, and output file reference |
 | `/taxbro-init [path]` | Load source folder, discover documents; `--reset` to snapshot outputs and start fresh |
+| `/taxbro-next` | **Identify and execute the next eligible command (orchestrator)** |
 | `/taxbro-extract` | Read all documents → build `US-knowledge-graph.md` (run after init, before checklist) |
 | `/taxbro-checklist` | Full status review — reads knowledge graph + flags items for attention |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding check |

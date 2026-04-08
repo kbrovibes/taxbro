@@ -95,6 +95,8 @@ Steps:
 8. Tell the user: "TaxBro initialized. Source folder loaded with N documents. Run /taxbro-checklist to see full status."
    If Finder aliases were found, include the warning about converting them.
 
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: Never write any PII, financial data, or document contents to ~/claude/taxbro/ or any file within it.
 
 ABSOLUTE RULE — NO DELETIONS EVER:

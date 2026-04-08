@@ -14,7 +14,7 @@ TaxBro is a set of **Claude Code slash commands** (skills) organized around a tw
 ┌─────────────────────────────────────────────────────────────────┐
 │                        YOUR TAX FOLDER                          │
 │                                                                 │
-│  W-2s   1099s   1098s   Bank Statements   CAMS CAS   AIS/TIS   │
+│  W-2s   1099s   1098s   Bank Statements   CAMS CAS   AIS/TIS    │
 │  Childcare Receipts   Interest Certs   Advance Tax Challans     │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
@@ -37,9 +37,9 @@ TaxBro is a set of **Claude Code slash commands** (skills) organized around a tw
 │                                                                 │
 │                              ▼                                  │
 │             ┌────────────────────────────────┐                  │
-│             │    US-knowledge-graph.md        │                  │
+│             │    US-knowledge-graph.md       │                  │
 │             │                                │                  │
-│             │  Issues & Flags   🔴 ⚠️ ℹ️       │                  │
+│             │  Issues & Flags   🔴 ⚠️ ℹ️      │                  │
 │             │  Identity                      │                  │
 │             │  Income (W-2 / 1099 / HSA)     │                  │
 │             │  Foreign Income                │                  │
@@ -57,6 +57,7 @@ TaxBro is a set of **Claude Code slash commands** (skills) organized around a tw
 ┌─────────────────────────────────────────────────────────────────┐
 │  PHASE 2 — ANALYSIS                                             │
 │                                                                 │
+│  /taxbro-next          → status-aware orchestrator (start here) │
 │  /taxbro-checklist     → topic-by-topic review + priority flags │
 │  /taxbro-check-w2s     → excess SS calc, DCFSA, withholding     │
 │  /taxbro-check-fbar    → FBAR/8938 thresholds + account table   │
@@ -81,7 +82,7 @@ TaxBro is a set of **Claude Code slash commands** (skills) organized around a tw
 │  US-childcare-summary.md     US-rental-income.md                │
 │  US-worksheets.md            US-validation-report.md            │
 │                                                                 │
-│  ⚠️  Keep this folder private — it contains your financial data  │
+│  ⚠️  Keep this folder private — it contains your financial data │
 │  ✅  Nothing sensitive ever touches the TaxBro repo itself       │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -121,9 +122,10 @@ The graph uses confidence markers on every value:
 
 ```
 /taxbro-init /path/to/your/tax/folder/
-/taxbro-extract
-/taxbro-checklist
+/taxbro-next
 ```
+
+`/taxbro-next` is the status-aware orchestrator. Run it after initialization to see exactly where you are and what to do next. It builds an ASCII checklist and can automatically trigger the next required skill.
 
 After `/taxbro-checklist` shows you what needs attention, work through the topics. The checklist output is prioritized — critical items (🔴) first, then items needing attention (⚠️), then clear items (✅).
 
@@ -216,8 +218,9 @@ Add a `CLAUDE.md` to your tax documents folder. Every skill reads it before runn
 | `/taxbro --status` | Compact key:value status of current session |
 | `/taxbro-init [path]` | Load source folder, discover documents |
 | `/taxbro-init --reset` | Archive existing outputs to snapshot, start fresh |
-| `/taxbro-extract` | Read all documents → build knowledge graph (run before checklist) |
-| `/taxbro-checklist` | Topic-by-topic review with priorities and next actions |
+| `/taxbro-next` | **Identify and execute the next eligible command (orchestrator)** |
+| `/taxbro-extract` | **Read all documents → build US-knowledge-graph.md** (run before checklist) |
+| `/taxbro-checklist` | Full status check and topic-by-topic review (reads knowledge graph) |
 | `/taxbro-check-w2s` | W-2 analysis: excess SS, DCFSA, withholding |
 | `/taxbro-check-fbar` | Foreign accounts: FBAR / Form 8938 thresholds |
 | `/taxbro-check-pfic` | PFIC: Form 8621 determination per fund |

@@ -58,5 +58,7 @@ Steps:
    - Depreciation calculation (or flag if basis unknown)
    - Form 1116 amount to carry to /taxbro-foreign-tax-credit
 
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: All output goes to {SOURCE_FOLDER}/TAXBRO/US-rental-income.md only.
 Never write financial data to ~/claude/taxbro/.

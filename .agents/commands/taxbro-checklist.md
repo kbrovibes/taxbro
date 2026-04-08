@@ -80,5 +80,7 @@ Steps:
    - Recommended next step (e.g., "Run /taxbro-generate-worksheets — all data present"
      or "Run /taxbro-extract first — graph is missing")
 
+9. Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md` recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 IMPORTANT: Never write any PII, account numbers, or financial figures to ~/claude/taxbro/.
 All output goes to {SOURCE_FOLDER}/TAXBRO/US-checklist.md only.

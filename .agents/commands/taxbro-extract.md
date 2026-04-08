@@ -455,6 +455,8 @@ After writing the knowledge graph:
    "Knowledge graph built. N documents read. X critical issues, Y items needing attention.
    Run /taxbro-checklist to review the full picture, or ask me to walk through any specific topic."
 
+3. **Append an entry to `{SOURCE_FOLDER}/TAXBRO/agent-log.md`** recording: agent-id (e.g., `gemini-2.0-flash`), skill-name, status (complete/partial/failed), artifacts written, key findings, and suggested next steps.
+
 ---
 
 ## Extraction Rules (Always Apply)
