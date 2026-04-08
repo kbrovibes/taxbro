@@ -93,6 +93,12 @@ For each consolidated 1099:
 - 1099-B summary: total proceeds, total cost basis (covered), net gain/loss, wash sale disallowed amount
   CRITICAL: RSU sales in Box B or E often show $0 basis. Scan for "Fidelity Supplemental" or "2025-TAX-RETURN-SUMMARY.md" in the source folder to find the actual adjusted cost basis (FMV at vest). Always flag $0 basis for preparer adjustment if supplemental basis isn't found.
   NOTE: Do NOT list individual trades. Extract totals only. Note if Form 8949 required.
+- **Quarterly capital gain attribution (for Form 2210):** From the 1099-B trade dates, determine
+  which quarter(s) the bulk of capital gains were realized:
+  - Q1: Jan–Mar | Q2: Apr–May | Q3: Jun–Aug | Q4: Sep–Dec
+  - Record approximate gain per quarter (e.g., "Q4: ~$280K of $288K total")
+  - This is critical for determining whether the annualized income method (Schedule AI)
+    can reduce the underpayment penalty when income is concentrated in later quarters.
 - Total federal withholding across the form
 
 ### 1099-INT (Standalone interest income)
@@ -227,6 +233,8 @@ After extracting all sections, run these checks. Add each issue to the Issues & 
 | Excess SS | Sum all W-2 Box 4 values. If total > $10,918.20 (6.2% × $176,100 for 2025), excess is a refundable credit | 🔴 Flag with amount |
 | Mortgage cap | Sum all 1098 Box 2 outstanding principal. If > $750,000, interest deduction is proportionally limited | ⚠️ Flag with total |
 | Form 2441 earned income | If spouse has no W-2 income and no 1099-NEC / self-employment, childcare credit = $0 unless exception | 🔴 Flag |
+| DCFSA exclusion (IRC §129) | If spouse earned income = $0 and no student/disability exception, DCFSA exclusion = $0. The full W-2 Box 10 amount must be **added back to taxable income** (Box 1 wages are understated). This is separate from the Form 2441 credit test. | 🔴 Flag with amount to add back |
+| Form 2210 quarterly timing | Extract trade dates from 1099-B (or note which quarter bulk of capital gains occurred). If estimated payments were only made in Q4 but income was earned throughout, penalty applies. Note whether annualized income method (Schedule AI) could reduce penalty. | ⚠️ Flag with quarterly attribution |
 | HSA over-contribution | Compare 5498-SA Box 2 vs limit ($8,300 family / $4,150 individual for 2025) + employer Box 12W | ⚠️ Flag if close or over |
 | FBAR threshold | Sum all foreign account max balances (USD). If aggregate > $10,000 at any point, FBAR is required | 🔴 Flag if required |
 | Form 8938 threshold | Sum all foreign financial asset year-end values (USD). MFJ US resident: required if > $100,000 year-end or > $150,000 any point | ⚠️ Flag if close or required |
@@ -378,7 +386,10 @@ _Combined outstanding principal: $? — limit check: {'✓ under $750k' or '⚠�
 | Net qualifying expenses (total - DCFSA) | |
 | Max qualifying (1 child: $3k / 2+: $6k) | |
 | Vinaya earned income | $0 — no W-2 |
-| Form 2441 credit | **Likely $0** — earned income test fails |
+| Disability/student exception | ✗ / ✓ (check CLAUDE.md) |
+| Form 2441 credit | **$0** — earned income test fails |
+| **DCFSA exclusion valid?** | **🔴 NO if spouse $0 earned income** — IRC §129(b)(2): exclusion limited to lesser of either spouse's earned income. If $0, full Box 10 amount added back to taxable income |
+| DCFSA add-back to income | $? — amount to add to Line 1 wages |
 
 ---
 

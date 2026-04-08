@@ -28,7 +28,17 @@ Steps:
    - Exceptions: a spouse who is (a) a full-time student for at least 5 months, or (b) disabled
    - If CLAUDE.md indicates spouse does not work AND no exception applies:
      FLAG: "Form 2441 credit likely DISALLOWED — spouse has no earned income. Confirm exception status with tax preparer."
-   - Note: even if credit is disallowed, DCFSA (Box 10) pre-tax benefit is still valid
+
+   DCFSA exclusion test — EQUALLY CRITICAL:
+   - Under IRC §129(b)(2), the DCFSA exclusion (Box 10) is limited to the LESSER of
+     either spouse's earned income.
+   - If spouse earned income = $0 and no student/disability exception applies:
+     **The DCFSA exclusion is $0. The full Box 10 amount must be ADDED BACK to taxable income.**
+     This means the W-2 Box 1 wages are understated by the DCFSA amount.
+   - If student exception applies: deemed earned income = $250/month × months enrolled
+     ($3,000/year for 1 child, $6,000/year for 2+ children)
+   - FLAG as 🔴 CRITICAL: "DCFSA exclusion of $X disallowed — spouse $0 earned income.
+     Add $X back to Line 1 wages. Preparer must adjust."
 
 7. Credit rate:
    - Credit is non-refundable, 20%–35% of qualifying expenses depending on AGI
